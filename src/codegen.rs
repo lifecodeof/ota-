@@ -28,11 +28,11 @@ impl Interpreter {
             Statement::VariableDeclaration(decl) => self.execute_variable_declaration(decl),
             Statement::Assignment(assign) => self.execute_assignment(assign),
             Statement::Output(output) => self.execute_output_statement(output),
-            Statement::IfStatement(_) => todo!("Implement if statement execution"),
-            Statement::WhileLoop(_) => todo!("Implement while loop execution"),
-            Statement::ForLoop(_) => todo!("Implement for loop execution"),
-            Statement::BreakStatement => todo!("Implement break statement"),
-            Statement::ContinueStatement => todo!("Implement continue statement"),
+            Statement::IfStatement(if_stmt) => self.execute_if_statement(if_stmt),
+            Statement::WhileLoop(while_loop) => self.execute_while_loop(while_loop),
+            Statement::ForLoop(for_loop) => self.execute_for_loop(for_loop),
+            Statement::BreakStatement => self.execute_break(),
+            Statement::ContinueStatement => self.execute_continue(),
         }
     }
 
@@ -93,5 +93,25 @@ impl Interpreter {
             (VariableValue::String(l), VariableValue::String(r)) => Ok(VariableValue::String(l + &r)),
             (left_val, right_val) => Err(format!("Cannot add values of types {:?} and {:?}. Addition is only supported between matching numeric types or strings.", left_val, right_val)),
         }
+    }
+
+    fn execute_if_statement(&mut self, if_stmt: &IfStatement) -> Result<(), String> {
+        todo!("Implement if statement execution")
+    }
+
+    fn execute_while_loop(&mut self, while_loop: &WhileLoop) -> Result<(), String> {
+        todo!("Implement while loop execution")
+    }
+
+    fn execute_for_loop(&mut self, for_loop: &ForLoop) -> Result<(), String> {
+        todo!("Implement for loop execution")
+    }
+
+    fn execute_break(&mut self) -> Result<(), String> {
+        todo!("Implement break statement")
+    }
+
+    fn execute_continue(&mut self) -> Result<(), String> {
+        todo!("Implement continue statement")
     }
 }
