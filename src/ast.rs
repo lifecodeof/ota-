@@ -82,4 +82,6 @@ pub enum Expression {
 #[derive(Debug, Clone)]
 pub enum BinaryOperator {
     Add,
+    GreaterThan,
+    GreaterThanOrEqual,
 }

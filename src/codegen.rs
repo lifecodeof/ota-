@@ -83,6 +83,8 @@ impl Interpreter {
     fn evaluate_binary_op(&self, left: VariableValue, right: VariableValue, op: &BinaryOperator) -> Result<VariableValue, String> {
         match op {
             BinaryOperator::Add => self.add_values(left, right),
+            BinaryOperator::GreaterThan => self.compare_greater(left, right),
+            BinaryOperator::GreaterThanOrEqual => self.compare_greater_equal(left, right),
         }
     }
 
@@ -95,8 +97,41 @@ impl Interpreter {
         }
     }
 
+    fn compare_greater(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+        match (left, right) {
+            (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l > r)),
+            (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l > r)),
+            (left_val, right_val) => Err(format!("Cannot compare values of types {:?} and {:?} with >. Comparison is only supported between matching numeric types.", left_val, right_val)),
+        }
+    }
+
+    fn compare_greater_equal(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+        match (left, right) {
+            (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l >= r)),
+            (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l >= r)),
+            (left_val, right_val) => Err(format!("Cannot compare values of types {:?} and {:?} with >=. Comparison is only supported between matching numeric types.", left_val, right_val)),
+        }
+    }
+
+    fn execute_control_block(&mut self, block: &ControlBlock) -> Result<(), String> {
+        for statement in &block.statements {
+            self.execute_statement(statement)?;
+        }
+        Ok(())
+    }
+
     fn execute_if_statement(&mut self, if_stmt: &IfStatement) -> Result<(), String> {
-        todo!("Implement if statement execution")
+        let condition_value = self.evaluate_expression(&if_stmt.condition.expression)?;
+        if let VariableValue::Bool(cond) = condition_value {
+            if cond {
+                self.execute_control_block(&if_stmt.then_block)?;
+            } else if let Some(else_block) = &if_stmt.else_block {
+                self.execute_control_block(else_block)?;
+            }
+            Ok(())
+        } else {
+            Err("If condition must evaluate to a boolean".to_string())
+        }
     }
 
     fn execute_while_loop(&mut self, while_loop: &WhileLoop) -> Result<(), String> {
@@ -113,5 +148,45 @@ impl Interpreter {
 
     fn execute_continue(&mut self) -> Result<(), String> {
         todo!("Implement continue statement")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_execute_if_statement() {
+        let mut interpreter = Interpreter::new();
+        // Declare x = 10
+        let decl = VariableDeclaration {
+            name: "x".to_string(),
+            var_type: VariableType::Tamsayi,
+        };
+        interpreter.execute_variable_declaration(&decl).unwrap();
+        interpreter.execute_assignment(&Assignment {
+            name: "x".to_string(),
+            expression: Expression::Literal(VariableValue::Int(10)),
+        }).unwrap();
+
+        // If x > 5 then output "Büyük"
+        let if_stmt = IfStatement {
+            condition: Condition {
+                expression: Box::new(Expression::BinaryOp(
+                    Box::new(Expression::VariableRef("x".to_string())),
+                    BinaryOperator::GreaterThan,
+                    Box::new(Expression::Literal(VariableValue::Int(5))),
+                )),
+            },
+            then_block: ControlBlock {
+                statements: vec![Statement::Output(OutputStatement {
+                    expression: Expression::Literal(VariableValue::String("Büyük".to_string())),
+                })],
+            },
+            else_block: None,
+        };
+
+        interpreter.execute_if_statement(&if_stmt).unwrap();
+        // Should have printed "Büyük"
     }
 }

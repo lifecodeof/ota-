@@ -1,0 +1,8 @@
+yaş'ı tamsayı olarak tanımla
+yaş = 20
+
+eğer yaş >= 18 ise
+    söyle "Yetişkin"
+yoksa
+    söyle "Çocuk"
+son

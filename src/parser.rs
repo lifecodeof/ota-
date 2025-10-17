@@ -80,7 +80,13 @@ fn parse_expression(pair: pest::iterators::Pair<Rule>) -> Result<Expression, Box
                 terms.push(expr);
             }
             Rule::operator => {
-                ops.push(BinaryOperator::Add);
+                let op_str = inner.as_str();
+                ops.push(match op_str {
+                    "+" => BinaryOperator::Add,
+                    ">" => BinaryOperator::GreaterThan,
+                    ">=" => BinaryOperator::GreaterThanOrEqual,
+                    _ => return Err(format!("Unknown operator: {}", op_str).into()),
+                });
             }
             _ => return Err(format!("Unexpected token in expression: {:?}", inner.as_rule()).into()),
         }
@@ -137,7 +143,8 @@ fn parse_if_statement(pair: pest::iterators::Pair<Rule>) -> Result<IfStatement, 
     let mut inner = pair.into_inner();
     // Skip "eğer"
     let condition_pair = inner.next().unwrap();
-    let condition = Condition { expression: Box::new(parse_expression(condition_pair)?) };
+    let expr_pair = condition_pair.into_inner().next().unwrap();
+    let condition = Condition { expression: Box::new(parse_expression(expr_pair)?) };
     // Skip "ise"
     let then_block = parse_control_block(inner.next().unwrap())?;
     let else_block = if let Some(yoksa_pair) = inner.next() {
@@ -322,6 +329,41 @@ mod tests {
             assert_eq!(decl.var_type, VariableType::Tamsayi);
         } else {
             panic!("Not variable declaration");
+        }
+    }
+
+    #[test]
+    fn test_parse_if_statement() {
+        let input = "eğer x > 5 ise\nsöyle \"Büyük\"\nson";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::IfStatement(if_stmt) = &program.statements[0] {
+            // Check condition
+            if let Expression::BinaryOp(left, BinaryOperator::GreaterThan, right) = &*if_stmt.condition.expression {
+                if let Expression::VariableRef(var) = &**left {
+                    assert_eq!(var, "x");
+                } else {
+                    panic!("Left not variable x");
+                }
+                if let Expression::Literal(VariableValue::Int(5)) = &**right {
+                    // ok
+                } else {
+                    panic!("Right not 5");
+                }
+            } else {
+                panic!("Condition not binary op >");
+            }
+            // Check then block
+            assert_eq!(if_stmt.then_block.statements.len(), 1);
+            if let Statement::Output(_) = &if_stmt.then_block.statements[0] {
+                // ok
+            } else {
+                panic!("Then block not output");
+            }
+            // No else block
+            assert!(if_stmt.else_block.is_none());
+        } else {
+            panic!("Not if statement");
         }
     }
 }
