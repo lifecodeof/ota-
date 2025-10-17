@@ -11,14 +11,14 @@ pub struct Variable {
 
 #[allow(dead_code)]
 pub struct SymbolTable {
-    symbols: HashMap<String, Variable>,
+    scopes: Vec<HashMap<String, Variable>>,
 }
 
 #[allow(dead_code)]
 impl SymbolTable {
     pub fn new() -> Self {
         SymbolTable {
-            symbols: HashMap::new(),
+            scopes: vec![HashMap::new()],
         }
     }
 
@@ -28,18 +28,38 @@ impl SymbolTable {
             var_type,
             value: None,
         };
-        self.symbols.insert(name, variable);
+        self.scopes.last_mut().unwrap().insert(name, variable);
     }
 
     #[allow(dead_code)]
     pub fn lookup(&self, name: &str) -> Option<&Variable> {
-        self.symbols.get(name)
+        for scope in self.scopes.iter().rev() {
+            if let Some(var) = scope.get(name) {
+                return Some(var);
+            }
+        }
+        None
     }
 
     #[allow(dead_code)]
     pub fn update_value(&mut self, name: &str, value: VariableValue) {
-        if let Some(var) = self.symbols.get_mut(name) {
-            var.value = Some(value);
+        for scope in self.scopes.iter_mut().rev() {
+            if let Some(var) = scope.get_mut(name) {
+                var.value = Some(value);
+                return;
+            }
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn push_scope(&mut self) {
+        self.scopes.push(HashMap::new());
+    }
+
+    #[allow(dead_code)]
+    pub fn pop_scope(&mut self) {
+        if self.scopes.len() > 1 {
+            self.scopes.pop();
         }
     }
 }
