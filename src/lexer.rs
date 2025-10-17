@@ -44,6 +44,39 @@ pub enum Token {
 
     #[token("yanlış")]
     False,
+
+    #[token("eğer")]
+    Eger,
+
+    #[token("yoksa")]
+    Yoksa,
+
+    #[token("döngü")]
+    Dongu,
+
+    #[token("için")]
+    Icin,
+
+    #[token("durdur")]
+    Durdur,
+
+    #[token("devam")]
+    Devam,
+
+    #[token("ise")]
+    Ise,
+
+    #[token("son")]
+    Son,
+
+    #[token("dan")]
+    Dan,
+
+    #[token("adım")]
+    Adim,
+
+    #[token("in")]
+    In,
 }
 
 
