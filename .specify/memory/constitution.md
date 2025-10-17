@@ -1,7 +1,7 @@
 <!--
 Sync Impact Report:
-- Version change: 1.0.0 → 1.1.0
-- Modified sections: Technical Standards (added compiler tech), Development Workflow (added testing encouragement)
+- Version change: 1.1.0 → 1.1.1
+- Modified sections: Governance (added agent responsibility)
 - Templates requiring updates: none
 - Follow-up TODOs: none
 -->
@@ -40,6 +40,6 @@ Support modular design, libraries, and extensions. Allow users to build upon the
 
 ## Governance
 
-Constitution supersedes all other practices. Amendments require community consensus and documentation. All changes must verify compliance with principles.
+Constitution supersedes all other practices. Amendments require community consensus and documentation. All changes must verify compliance with principles. Agents are responsible for committing their generated work and changes.
 
-**Version**: 1.1.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
+**Version**: 1.1.1 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
