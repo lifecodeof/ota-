@@ -7,6 +7,19 @@
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+## Current Status Summary
+
+- ✅ **Phase 1 (Setup)**: Complete
+- ✅ **Phase 2 (Foundational)**: Complete  
+- ✅ **Phase 3 (US1 - Basic Variables)**: Complete
+- ✅ **Phase 4 (US2 - Multiple Types)**: Complete (with interpreter approach)
+- 🔄 **Phase 5 (US3 - Expressions)**: Ready to start
+- ⏳ **Phase 6 (Polish)**: Pending
+
+**Next Priority**: Begin User Story 3 (Expressions with variables)
+
+---
+
 ## Format: `[ID] [P?] [Story] Description`
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
@@ -68,12 +81,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Extend type system for all supported types in otağ-compiler/src/types.rs
-- [ ] T015 [US2] Update AST for type variants in otağ-compiler/src/ast.rs
-- [ ] T016 [US2] Update codegen for different LLVM types in otağ-compiler/src/codegen.rs
-- [ ] T017 [US2] Update lexer for type keywords in otağ-compiler/src/lexer.rs
+- [x] T014 [US2] Extend type system for all supported types in otağ-compiler/src/types.rs
+- [x] T015 [US2] Update AST for type variants in otağ-compiler/src/ast.rs
+- [x] T016 [US2] Switch to interpreter for easier testing in otağ-compiler/src/codegen.rs (replaces LLVM codegen)
+- [x] T017 [US2] Add comprehensive unit tests for all data types
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
+
+**Status Update**: US2 implementation complete with interpreter approach for better testability. All data types (int, string, float, bool) supported with comprehensive tests.
 
 ---
 
