@@ -37,6 +37,8 @@ fn parse_statement(pair: pest::iterators::Pair<Rule>) -> Result<Statement, Box<d
         Rule::for_statement => Ok(Statement::ForLoop(parse_for_statement(inner)?)),
         Rule::break_statement => Ok(Statement::Break),
         Rule::continue_statement => Ok(Statement::Continue),
+        Rule::function_definition => Ok(Statement::FunctionDefinition(parse_function_definition(inner)?)),
+        Rule::return_statement => Ok(Statement::Return(parse_return_statement(inner)?)),
         _ => Err(format!("Unknown statement type: {:?}", inner.as_rule()).into()),
     }
 }
@@ -120,7 +122,8 @@ fn parse_term(pair: pest::iterators::Pair<Rule>) -> Result<Expression, Box<dyn s
     match inner.as_rule() {
         Rule::identifier => Ok(Expression::VariableRef(inner.as_str().to_string())),
         Rule::literal => Ok(Expression::Literal(parse_literal(inner)?)),
-        _ => Err(format!("Expected identifier or literal, found: {:?}", inner.as_rule()).into()),
+        Rule::function_call => Ok(Expression::FunctionCall(parse_function_call(inner)?)),
+        _ => Err(format!("Expected identifier, literal, or function call, found: {:?}", inner.as_rule()).into()),
     }
 }
 
@@ -209,6 +212,89 @@ fn parse_range_spec(pair: pest::iterators::Pair<Rule>) -> RangeSpecResult {
         None
     };
     Ok((start, end, step))
+}
+
+fn parse_function_definition(pair: pest::iterators::Pair<Rule>) -> Result<FunctionDefinition, Box<dyn std::error::Error>> {
+    let mut inner = pair.into_inner();
+    // Skip "fonksiyon"
+    let name = inner.next().unwrap().as_str().to_string();
+    // Skip "("
+    let mut parameters = Vec::new();
+    if let Some(param_list) = inner.next() {
+        if param_list.as_rule() == Rule::parameter_list {
+            for param_pair in param_list.into_inner() {
+                parameters.push(parse_parameter(param_pair)?);
+            }
+        }
+    }
+    // Skip ")"
+    let mut body = Vec::new();
+    let return_type = if let Some(next) = inner.next() {
+        if next.as_rule() == Rule::return_part {
+            let mut return_inner = next.into_inner();
+            let _arrow = return_inner.next().unwrap(); // "->"
+            let type_pair = return_inner.next().unwrap();
+            Some(parse_type_keyword(type_pair)?)
+        } else if next.as_rule() == Rule::statement {
+            body.push(parse_statement(next)?);
+            None
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+    for stmt_pair in inner {
+        if stmt_pair.as_rule() == Rule::statement {
+            body.push(parse_statement(stmt_pair)?);
+        }
+    }
+    Ok(FunctionDefinition { name, parameters, return_type, body })
+}
+
+fn parse_parameter(pair: pest::iterators::Pair<Rule>) -> Result<Parameter, Box<dyn std::error::Error>> {
+    let mut inner = pair.into_inner();
+    let name = inner.next().unwrap().as_str().to_string();
+    // Skip ":"
+    let param_type = parse_type_keyword(inner.next().unwrap())?;
+    Ok(Parameter { name, param_type })
+}
+
+fn parse_type_keyword(pair: pest::iterators::Pair<Rule>) -> Result<VariableType, Box<dyn std::error::Error>> {
+    let type_str = pair.as_str();
+    match type_str {
+        "tamsayı" => Ok(VariableType::Tamsayi),
+        "metin" => Ok(VariableType::Metin),
+        "ondalıklı" => Ok(VariableType::Ondalikli),
+        "mantıksal" => Ok(VariableType::Mantiksal),
+        _ => Err(format!("Unknown type '{}'", type_str).into()),
+    }
+}
+
+fn parse_return_statement(pair: pest::iterators::Pair<Rule>) -> Result<Option<Expression>, Box<dyn std::error::Error>> {
+    let mut inner = pair.into_inner();
+    // Skip "return"
+    if let Some(expr_pair) = inner.next() {
+        Ok(Some(parse_expression(expr_pair)?))
+    } else {
+        Ok(None)
+    }
+}
+
+fn parse_function_call(pair: pest::iterators::Pair<Rule>) -> Result<FunctionCall, Box<dyn std::error::Error>> {
+    let mut inner = pair.into_inner();
+    let name = inner.next().unwrap().as_str().to_string();
+    // Skip "("
+    let mut arguments = Vec::new();
+    if let Some(arg_list) = inner.next() {
+        if arg_list.as_rule() == Rule::argument_list {
+            for expr_pair in arg_list.into_inner() {
+                arguments.push(parse_expression(expr_pair)?);
+            }
+        }
+    }
+    // Skip ")"
+    Ok(FunctionCall { name, arguments })
 }
 
 #[cfg(test)]
@@ -398,6 +484,57 @@ mod tests {
             assert_eq!(while_loop.body.statements.len(), 2);
         } else {
             panic!("Not while statement");
+        }
+    }
+
+    #[test]
+    fn test_parse_function_definition() {
+        let input = "fonksiyon topla(a: tamsayı, b: tamsayı) {\nreturn a + b\n}";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::FunctionDefinition(func) = &program.statements[0] {
+            assert_eq!(func.name, "topla");
+            assert_eq!(func.parameters.len(), 2);
+            assert_eq!(func.parameters[0].name, "a");
+            assert_eq!(func.parameters[0].param_type, VariableType::Tamsayi);
+            assert_eq!(func.parameters[1].name, "b");
+            assert_eq!(func.parameters[1].param_type, VariableType::Tamsayi);
+            assert_eq!(func.return_type, None);
+            assert_eq!(func.body.len(), 1);
+            if let Statement::Return(Some(_)) = &func.body[0] {
+                // ok
+            } else {
+                panic!("Body not return");
+            }
+        } else {
+            panic!("Not function definition");
+        }
+    }
+
+    #[test]
+    fn test_parse_function_call() {
+        let input = "söyle topla(1, 2)";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::Output(out) = &program.statements[0] {
+            if let Expression::FunctionCall(call) = &out.expression {
+                assert_eq!(call.name, "topla");
+                assert_eq!(call.arguments.len(), 2);
+                if let Expression::Literal(VariableValue::Int(1)) = &call.arguments[0] {
+                    // ok
+                } else {
+                    panic!("Arg 0 not 1");
+                }
+                if let Expression::Literal(VariableValue::Int(2)) = &call.arguments[1] {
+                    // ok
+                } else {
+                    panic!("Arg 1 not 2");
+                }
+            } else {
+                panic!("Not function call");
+            }
+        } else {
+            panic!("Not output");
         }
     }
 }

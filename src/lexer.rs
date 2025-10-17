@@ -75,14 +75,14 @@ pub enum Token {
     #[token("adım")]
     Adim,
 
-    #[token("in")]
-    In,
+    #[token("fonksiyon")]
+    Fonksiyon,
 
-    #[token("<=")]
-    LessThanOrEqual,
+    #[token("->")]
+    Arrow,
 
-    #[token("<")]
-    LessThan,
+    #[token("return")]
+    Return,
 }
 
 

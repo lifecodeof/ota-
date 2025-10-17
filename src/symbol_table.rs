@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use crate::types::{VariableType, VariableValue};
+use crate::ast::FunctionDefinition;
 
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -12,6 +13,7 @@ pub struct Variable {
 #[allow(dead_code)]
 pub struct SymbolTable {
     scopes: Vec<HashMap<String, Variable>>,
+    functions: HashMap<String, FunctionDefinition>,
 }
 
 #[allow(dead_code)]
@@ -19,6 +21,7 @@ impl SymbolTable {
     pub fn new() -> Self {
         SymbolTable {
             scopes: vec![HashMap::new()],
+            functions: HashMap::new(),
         }
     }
 
@@ -29,6 +32,14 @@ impl SymbolTable {
             value: None,
         };
         self.scopes.last_mut().unwrap().insert(name, variable);
+    }
+
+    pub fn insert_function(&mut self, function: FunctionDefinition) {
+        self.functions.insert(function.name.clone(), function);
+    }
+
+    pub fn lookup_function(&self, name: &str) -> Option<&FunctionDefinition> {
+        self.functions.get(name)
     }
 
     #[allow(dead_code)]

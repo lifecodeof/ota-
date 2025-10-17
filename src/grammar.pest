@@ -2,7 +2,7 @@ WHITESPACE = _{ " " | "\t" | "\n" | "\r" | ("#" ~ (!"\n" ~ ANY)*) }
 
 program = { SOI ~ statement* ~ EOI }
 
-statement = { variable_declaration | assignment | output_statement | if_statement | while_statement | for_statement | break_statement | continue_statement }
+statement = { variable_declaration | assignment | output_statement | if_statement | while_statement | for_statement | break_statement | continue_statement | function_definition | return_statement }
 
 variable_declaration = { identifier ~ "'ı" ~ type_keyword ~ "olarak" ~ "tanımla" }
 
@@ -12,7 +12,7 @@ output_statement = { "söyle" ~ expression }
 
 expression = { term ~ (operator ~ term)* }
 
-term = { literal | identifier }
+term = { function_call | literal | identifier }
 
 operator = { "<=" | "<" | ">=" | ">" | "+" }
 
@@ -45,3 +45,17 @@ for_statement = { "için" ~ identifier ~ "in" ~ range_spec ~ "ise" ~ control_blo
 break_statement = { "durdur" }
 
 continue_statement = { "devam" }
+
+return_statement = { "return" ~ expression? }
+
+return_part = { "->" ~ type_keyword }
+
+function_definition = { "fonksiyon" ~ identifier ~ "(" ~ parameter_list? ~ ")" ~ return_part? ~ "{" ~ statement* ~ "}" }
+
+parameter_list = { parameter ~ ("," ~ parameter)* }
+
+parameter = { identifier ~ ":" ~ type_keyword }
+
+function_call = { identifier ~ "(" ~ argument_list? ~ ")" }
+
+argument_list = { expression ~ ("," ~ expression)* }

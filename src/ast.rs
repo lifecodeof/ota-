@@ -15,6 +15,8 @@ pub enum Statement {
     ForLoop(ForLoop),
     Break,
     Continue,
+    FunctionDefinition(FunctionDefinition),
+    Return(Option<Expression>),
 }
 
 #[derive(Debug, Clone)]
@@ -80,10 +82,31 @@ pub struct ForLoop {
 }
 
 #[derive(Debug, Clone)]
+pub struct FunctionDefinition {
+    pub name: String,
+    pub parameters: Vec<Parameter>,
+    pub return_type: Option<VariableType>,
+    pub body: Vec<Statement>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Parameter {
+    pub name: String,
+    pub param_type: VariableType,
+}
+
+#[derive(Debug, Clone)]
 pub enum Expression {
     VariableRef(String),
     Literal(VariableValue),
     BinaryOp(Box<Expression>, BinaryOperator, Box<Expression>),
+    FunctionCall(FunctionCall),
+}
+
+#[derive(Debug, Clone)]
+pub struct FunctionCall {
+    pub name: String,
+    pub arguments: Vec<Expression>,
 }
 
 #[derive(Debug, Clone)]

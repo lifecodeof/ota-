@@ -33,6 +33,8 @@ impl Interpreter {
             Statement::ForLoop(for_loop) => self.execute_for_loop(for_loop),
             Statement::Break => self.execute_break(),
             Statement::Continue => self.execute_continue(),
+            Statement::FunctionDefinition(_) => todo!("Implement function definition execution"),
+            Statement::Return(_) => todo!("Implement return statement execution"),
         }
     }
 
@@ -77,6 +79,7 @@ impl Interpreter {
                 let right_val = self.evaluate_expression(right)?;
                 self.evaluate_binary_op(left_val, right_val, op)
             },
+            Expression::FunctionCall(_) => todo!("Implement function call evaluation"),
         }
     }
 
