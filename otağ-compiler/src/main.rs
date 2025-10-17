@@ -11,7 +11,7 @@ use std::fs;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
-        eprintln!("Usage: {} <input.otag>", args[0]);
+        eprintln!("Usage: {} <input.otağ>", args[0]);
         std::process::exit(1);
     }
 

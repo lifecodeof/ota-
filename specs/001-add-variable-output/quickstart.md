@@ -44,8 +44,8 @@ söyle mesaj
 
 ## Running Programs
 
-1. Save code to `program.otag`
-2. Compile: `otag-compiler program.otag`
+1. Save code to `program.otağ`
+2. Compile: `otag-compiler program.otağ`
 3. Run: `./program`
 
 ## Notes
