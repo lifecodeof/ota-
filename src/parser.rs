@@ -40,6 +40,7 @@ fn parse_statement(pair: pest::iterators::Pair<Rule>) -> Result<Statement, Box<d
         Rule::continue_statement => Ok(Statement::Continue),
         Rule::function_definition => Ok(Statement::FunctionDefinition(parse_function_definition(inner)?)),
         Rule::return_statement => Ok(Statement::Return(parse_return_statement(inner)?)),
+        Rule::struct_definition => Ok(Statement::StructDefinition(parse_struct_definition(inner)?)),
         _ => Err(format!("Unknown statement type: {:?}", inner.as_rule()).into()),
     }
 }
@@ -325,6 +326,21 @@ fn parse_function_call(pair: pest::iterators::Pair<Rule>) -> Result<FunctionCall
     }
     // Skip ")"
     Ok(FunctionCall { name, arguments })
+}
+
+fn parse_struct_definition(pair: pest::iterators::Pair<Rule>) -> Result<StructDefinition, Box<dyn std::error::Error>> {
+    let mut inner = pair.into_inner();
+    let name = inner.next().unwrap().as_str().to_string();
+    let mut fields = Vec::new();
+    for field_pair in inner {
+        if field_pair.as_rule() == Rule::field_definition {
+            let mut field_inner = field_pair.into_inner();
+            let field_name = field_inner.next().unwrap().as_str().to_string();
+            let field_type = parse_type_keyword(field_inner.next().unwrap())?;
+            fields.push(FieldDefinition { name: field_name, field_type });
+        }
+    }
+    Ok(StructDefinition { name, fields })
 }
 
 #[cfg(test)]
@@ -622,6 +638,44 @@ mod tests {
             }
         } else {
             panic!("Not output");
+        }
+    }
+
+    #[test]
+    fn test_parse_field_definition2() {
+        let input = "yas: tamsayı";
+        let result = OtagParser::parse(Rule::field_definition, input);
+        match result {
+            Ok(pairs) => {
+                println!("Parsed: {:?}", pairs);
+            }
+            Err(e) => {
+                panic!("Parse error: {:?}", e);
+            }
+        }
+    }
+
+    #[test]
+    fn test_parse_struct_definition() {
+        let input = "ogrenci { isim: metin, yas: tamsayı }";
+        let result = parse(input);
+        match result {
+            Ok(program) => {
+                assert_eq!(program.statements.len(), 1);
+                if let Statement::StructDefinition(def) = &program.statements[0] {
+                    assert_eq!(def.name, "ogrenci");
+                    assert_eq!(def.fields.len(), 2);
+                    assert_eq!(def.fields[0].name, "isim");
+                    assert_eq!(def.fields[0].field_type, Type::Metin);
+                    assert_eq!(def.fields[1].name, "yas");
+                    assert_eq!(def.fields[1].field_type, Type::Tamsayi);
+                } else {
+                    panic!("Not struct definition");
+                }
+            }
+            Err(e) => {
+                panic!("Parse error: {:?}", e);
+            }
         }
     }
 }

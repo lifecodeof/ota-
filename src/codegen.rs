@@ -45,7 +45,10 @@ impl Interpreter {
                     Ok(None)
                 }
             },
-            Statement::StructDefinition(_) => todo!(),
+            Statement::StructDefinition(def) => {
+                self.symbol_table.insert_struct(def.clone())?;
+                Ok(None)
+            },
         }
     }
 
@@ -151,7 +154,6 @@ impl Interpreter {
                 }
             },
             Expression::StructLiteral(_) => todo!(),
-            Expression::StructAccess(_) => todo!(),
             Expression::StructAccess(_) => todo!(),
         }
     }

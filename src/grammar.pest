@@ -2,7 +2,11 @@ WHITESPACE = _{ " " | "\t" | "\n" | "\r" | ("#" ~ (!"\n" ~ ANY)*) }
 
 program = { SOI ~ statement* ~ EOI }
 
-statement = { variable_declaration | assignment | output_statement | if_statement | while_statement | for_statement | break_statement | continue_statement | function_definition | return_statement }
+statement = { struct_definition | variable_declaration | assignment | output_statement | if_statement | while_statement | for_statement | break_statement | continue_statement | function_definition | return_statement }
+
+struct_definition = { identifier ~ "{" ~ field_definition ~ ("," ~ field_definition)* ~ "}" }
+
+field_definition = { identifier ~ ":" ~ type_keyword }
 
 variable_declaration = { identifier ~ "'ı" ~ type_keyword ~ "olarak" ~ "tanımla" }
 
@@ -18,7 +22,7 @@ array_access = { identifier ~ "[" ~ expression ~ "]" }
 
 operator = { "<=" | "<" | ">=" | ">" | "+" }
 
-type_keyword = @{ "tamsayı" | "metin" | "ondalıklı" | "mantıksal" }
+type_keyword = { "tamsayı" | "metin" | "ondalıklı" | "mantıksal" }
 
 literal = { array_literal | string_literal | float_literal | int_literal | boolean_literal }
 
