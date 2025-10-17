@@ -18,12 +18,12 @@ impl Interpreter {
 
     pub fn execute_program(&mut self, program: &Program) -> Result<(), String> {
         for statement in &program.statements {
-            self.execute_statement(statement)?;
+            let _ = self.execute_statement(statement)?;
         }
         Ok(())
     }
 
-    fn execute_statement(&mut self, statement: &Statement) -> Result<(), String> {
+    fn execute_statement(&mut self, statement: &Statement) -> Result<Option<VariableValue>, String> {
         match statement {
             Statement::VariableDeclaration(decl) => self.execute_variable_declaration(decl),
             Statement::Assignment(assign) => self.execute_assignment(assign),
@@ -33,12 +33,22 @@ impl Interpreter {
             Statement::ForLoop(for_loop) => self.execute_for_loop(for_loop),
             Statement::Break => self.execute_break(),
             Statement::Continue => self.execute_continue(),
-            Statement::FunctionDefinition(_) => todo!("Implement function definition execution"),
-            Statement::Return(_) => todo!("Implement return statement execution"),
+            Statement::FunctionDefinition(func) => {
+                self.symbol_table.insert_function(func.clone())?;
+                Ok(None)
+            },
+            Statement::Return(expr) => {
+                if let Some(e) = expr {
+                    let val = self.evaluate_expression(e)?;
+                    Ok(Some(val))
+                } else {
+                    Ok(None)
+                }
+            },
         }
     }
 
-    fn execute_variable_declaration(&mut self, decl: &VariableDeclaration) -> Result<(), String> {
+    fn execute_variable_declaration(&mut self, decl: &VariableDeclaration) -> Result<Option<VariableValue>, String> {
         self.symbol_table.insert(decl.name.clone(), decl.var_type.clone());
         // Initialize with default values
         let default_value = match decl.var_type {
@@ -48,16 +58,16 @@ impl Interpreter {
             VariableType::Mantiksal => VariableValue::Bool(false),
         };
         self.variables.insert(decl.name.clone(), default_value);
-        Ok(())
+        Ok(None)
     }
 
-    fn execute_assignment(&mut self, assign: &Assignment) -> Result<(), String> {
+    fn execute_assignment(&mut self, assign: &Assignment) -> Result<Option<VariableValue>, String> {
         let value = self.evaluate_expression(&assign.expression)?;
         self.variables.insert(assign.name.clone(), value);
-        Ok(())
+        Ok(None)
     }
 
-    fn execute_output_statement(&mut self, output: &OutputStatement) -> Result<(), String> {
+    fn execute_output_statement(&mut self, output: &OutputStatement) -> Result<Option<VariableValue>, String> {
         let value = self.evaluate_expression(&output.expression)?;
         match value {
             VariableValue::Int(i) => println!("{}", i),
@@ -65,10 +75,10 @@ impl Interpreter {
             VariableValue::Float(f) => println!("{}", f),
             VariableValue::Bool(b) => println!("{}", if b { "doğru" } else { "yanlış" }),
         }
-        Ok(())
+        Ok(None)
     }
 
-    fn evaluate_expression(&self, expr: &Expression) -> Result<VariableValue, String> {
+    fn evaluate_expression(&mut self, expr: &Expression) -> Result<VariableValue, String> {
         match expr {
             Expression::VariableRef(name) => {
                 self.variables.get(name).cloned().ok_or_else(|| format!("Undefined variable: {}", name))
@@ -79,7 +89,40 @@ impl Interpreter {
                 let right_val = self.evaluate_expression(right)?;
                 self.evaluate_binary_op(left_val, right_val, op)
             },
-            Expression::FunctionCall(_) => todo!("Implement function call evaluation"),
+            Expression::FunctionCall(call) => {
+                let func = self.symbol_table.lookup_function(&call.name).ok_or_else(|| format!("Undefined function: {}", call.name))?.clone();
+                if call.arguments.len() != func.parameters.len() {
+                    return Err(format!("Function '{}' expects {} arguments, got {}", call.name, func.parameters.len(), call.arguments.len()));
+                }
+                let mut arg_values = Vec::new();
+                for arg in &call.arguments {
+                    arg_values.push(self.evaluate_expression(arg)?);
+                }
+                // Push new scope
+                self.symbol_table.push_scope();
+                // Set parameters as variables
+                for (param, val) in func.parameters.iter().zip(arg_values) {
+                    self.symbol_table.insert(param.name.clone(), param.param_type.clone());
+                    self.variables.insert(param.name.clone(), val);
+                }
+                // Execute body
+                let mut result = None;
+                for stmt in &func.body {
+                    let res = self.execute_statement(stmt)?;
+                    if let Some(val) = res {
+                        result = Some(val);
+                        break;
+                    }
+                }
+                // Pop scope
+                self.symbol_table.pop_scope();
+                // Remove param variables? But since scope popped, and variables are per interpreter, need to remove from variables too.
+                // Actually, variables are global, so need to remove the params.
+                for param in &func.parameters {
+                    self.variables.remove(&param.name);
+                }
+                result.ok_or_else(|| format!("Function '{}' did not return a value", call.name))
+            },
         }
     }
 
@@ -141,7 +184,7 @@ impl Interpreter {
         Ok(())
     }
 
-    fn execute_if_statement(&mut self, if_stmt: &IfStatement) -> Result<(), String> {
+    fn execute_if_statement(&mut self, if_stmt: &IfStatement) -> Result<Option<VariableValue>, String> {
         let condition_value = self.evaluate_expression(&if_stmt.condition.expression)?;
         if let VariableValue::Bool(cond) = condition_value {
             if cond {
@@ -149,13 +192,13 @@ impl Interpreter {
             } else if let Some(else_block) = &if_stmt.else_block {
                 self.execute_control_block(else_block)?;
             }
-            Ok(())
+            Ok(None)
         } else {
             Err("If condition must evaluate to a boolean".to_string())
         }
     }
 
-    fn execute_while_loop(&mut self, while_loop: &WhileLoop) -> Result<(), String> {
+    fn execute_while_loop(&mut self, while_loop: &WhileLoop) -> Result<Option<VariableValue>, String> {
         let mut iterations = 0;
         const MAX_ITERATIONS: usize = 10000; // Prevent infinite loops
 
@@ -175,18 +218,18 @@ impl Interpreter {
                 return Err("While loop condition must evaluate to a boolean".to_string());
             }
         }
-        Ok(())
+        Ok(None)
     }
 
-    fn execute_for_loop(&mut self, _for_loop: &ForLoop) -> Result<(), String> {
+    fn execute_for_loop(&mut self, _for_loop: &ForLoop) -> Result<Option<VariableValue>, String> {
         todo!("Implement for loop execution")
     }
 
-    fn execute_break(&mut self) -> Result<(), String> {
+    fn execute_break(&mut self) -> Result<Option<VariableValue>, String> {
         todo!("Implement break statement")
     }
 
-    fn execute_continue(&mut self) -> Result<(), String> {
+    fn execute_continue(&mut self) -> Result<Option<VariableValue>, String> {
         todo!("Implement continue statement")
     }
 }

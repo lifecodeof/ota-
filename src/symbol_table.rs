@@ -34,8 +34,12 @@ impl SymbolTable {
         self.scopes.last_mut().unwrap().insert(name, variable);
     }
 
-    pub fn insert_function(&mut self, function: FunctionDefinition) {
+    pub fn insert_function(&mut self, function: FunctionDefinition) -> Result<(), String> {
+        if self.functions.contains_key(&function.name) {
+            return Err(format!("Function '{}' already defined", function.name));
+        }
         self.functions.insert(function.name.clone(), function);
+        Ok(())
     }
 
     pub fn lookup_function(&self, name: &str) -> Option<&FunctionDefinition> {

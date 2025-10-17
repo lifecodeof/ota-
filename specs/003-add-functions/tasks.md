@@ -59,7 +59,7 @@
 - [X] T010 [US1] Implement function definition parsing in src/parser.rs using grammar rules
 - [X] T011 [US1] Add function storage to symbol table in src/symbol_table.rs
 - [X] T012 [US1] Generate LLVM IR for function definitions in src/codegen.rs
-- [ ] T013 [US1] Add error handling for invalid function definitions
+- [X] T013 [US1] Add error handling for invalid function definitions
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -113,12 +113,12 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T026 [P] Update documentation in README.md with function examples
-- [ ] T027 Code cleanup and refactoring across src/ files
-- [ ] T028 Performance optimization for function compilation
-- [ ] T029 [P] Additional unit tests in tests/unit/
-- [ ] T030 Run quickstart.md validation and update if needed
-- [ ] T031 Full integration test suite for all function features
+- [X] T026 [P] Update documentation in README.md with function examples
+- [X] T027 Code cleanup and refactoring across src/ files
+- [X] T028 Performance optimization for function compilation
+- [X] T029 [P] Additional unit tests in tests/unit/
+- [X] T030 Run quickstart.md validation and update if needed
+- [X] T031 Full integration test suite for all function features
 
 ---
 

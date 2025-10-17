@@ -8,8 +8,9 @@ Otağ is designed with Turkish localization as a core principle, providing an in
 
 ## Features
 
-- **Turkish Keywords**: Natural Turkish syntax (`tanımla`, `söyle`, etc.)
+- **Turkish Keywords**: Natural Turkish syntax (`tanımla`, `söyle`, `fonksiyon`, etc.)
 - **Type Safety**: Compile-time type checking
+- **Functions**: Define and call reusable code blocks
 - **UTF-8 Support**: Full Turkish character support (ğ, ü, ş, ö, ç, ı)
 - **Simple Syntax**: Beginner-friendly, readable code
 - **Cross-Platform**: Works on Windows, Linux, and macOS
@@ -90,6 +91,19 @@ söyle isim + " Dünya"
 ```otağ
 söyle değişken    # Print variable
 söyle ifade       # Print expression result
+```
+
+### Functions
+
+```otağ
+# Define a function with parameters and return type
+fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
+    return a + b
+}
+
+# Call a function
+sonuç = topla(5, 3)
+söyle sonuç  # Outputs 8
 ```
 
 ## Examples

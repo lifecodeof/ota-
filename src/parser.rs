@@ -2,6 +2,7 @@ use pest::Parser;
 use pest_derive::Parser;
 use crate::ast::*;
 use crate::types::*;
+use std::collections::HashSet;
 
 #[derive(Parser)]
 #[grammar = "src/grammar.pest"]
@@ -225,6 +226,13 @@ fn parse_function_definition(pair: pest::iterators::Pair<Rule>) -> Result<Functi
             for param_pair in param_list.into_inner() {
                 parameters.push(parse_parameter(param_pair)?);
             }
+        }
+    }
+    // Check for duplicate parameter names
+    let mut param_names = HashSet::new();
+    for param in &parameters {
+        if !param_names.insert(param.name.clone()) {
+            return Err(format!("Duplicate parameter name '{}' in function '{}'", param.name, name).into());
         }
     }
     // Skip ")"
