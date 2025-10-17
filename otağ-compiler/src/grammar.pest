@@ -8,20 +8,20 @@ variable_declaration = { identifier ~ "'" ~ type_keyword ~ "olarak" ~ "tanımla"
 
 assignment = { identifier ~ "=" ~ expression }
 
-output_statement = { "söyle" ~ expression }
+output_statement = { "print" ~ expression }
 
-expression = { identifier | literal }
+expression = { literal | identifier }
 
 type_keyword = { "tamsayı" | "metin" | "ondalıklı" | "mantıksal" }
 
-literal = { string_literal | int_literal | float_literal | boolean_literal }
+literal = { string_literal | float_literal | int_literal | boolean_literal }
 
-string_literal = { "\"" ~ (!"\"" ~ ("\\\"" | !("\\" | "\"") ~ ANY))* ~ "\"" }
+string_literal = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
 
 int_literal = { ASCII_DIGIT+ }
 
 float_literal = { ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+ }
 
-boolean_literal = { "doğru" | "yanlış" }
+boolean_literal = { "true" | "false" }
 
-identifier = { (ASCII_ALPHANUMERIC | "_")+ }
+identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_") * }

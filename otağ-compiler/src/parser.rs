@@ -8,13 +8,14 @@ use crate::types::*;
 pub struct OtagParser;
 
 pub fn parse(input: &str) -> Result<Program, Box<dyn std::error::Error>> {
-    let pairs = OtagParser::parse(Rule::program, input)?;
+    let mut pairs = OtagParser::parse(Rule::program, input)?;
     
+    let program_pair = pairs.next().unwrap();
     let mut statements = Vec::new();
     
-    for pair in pairs {
-        if pair.as_rule() == Rule::statement {
-            statements.push(parse_statement(pair)?);
+    for inner in program_pair.into_inner() {
+        if inner.as_rule() == Rule::statement {
+            statements.push(parse_statement(inner)?);
         }
     }
     
@@ -85,9 +86,98 @@ fn parse_literal(pair: pest::iterators::Pair<Rule>) -> Result<VariableValue, Box
         Rule::int_literal => Ok(VariableValue::Int(inner.as_str().parse()?)),
         Rule::float_literal => Ok(VariableValue::Float(inner.as_str().parse()?)),
         Rule::boolean_literal => {
-            let val = inner.as_str() == "doğru";
+            let val = inner.as_str() == "true";
             Ok(VariableValue::Bool(val))
         },
         _ => Err("Unknown literal".into()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_assignment() {
+        let input = "isim = 123";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::Assignment(assign) = &program.statements[0] {
+            assert_eq!(assign.name, "isim");
+            if let Expression::Literal(VariableValue::Int(123)) = &assign.expression {
+                // ok
+            } else {
+                panic!("Wrong expression");
+            }
+        } else {
+            panic!("Not assignment");
+        }
+    }
+
+    #[test]
+    fn test_parse_output() {
+        let input = "print isim";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::OutputStatement(out) = &program.statements[0] {
+            if let Expression::VariableRef(name) = &out.expression {
+                assert_eq!(name, "isim");
+            } else {
+                panic!("Wrong expression");
+            }
+        } else {
+            panic!("Not output");
+        }
+    }
+
+    #[test]
+    fn test_parse_string_assignment() {
+        let input = r#"mesaj = "Merhaba""#;
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::Assignment(assign) = &program.statements[0] {
+            assert_eq!(assign.name, "mesaj");
+            if let Expression::Literal(VariableValue::String(s)) = &assign.expression {
+                assert_eq!(s, "Merhaba");
+            } else {
+                panic!("Wrong expression");
+            }
+        } else {
+            panic!("Not assignment");
+        }
+    }
+
+    #[test]
+    fn test_parse_float_assignment() {
+        let input = "pi = 3.14";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::Assignment(assign) = &program.statements[0] {
+            assert_eq!(assign.name, "pi");
+            if let Expression::Literal(VariableValue::Float(f)) = &assign.expression {
+                assert!((f - 3.14).abs() < 0.001);
+            } else {
+                panic!("Wrong expression");
+            }
+        } else {
+            panic!("Not assignment");
+        }
+    }
+
+    #[test]
+    fn test_parse_bool_assignment() {
+        let input = "dogru_mu = true";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::Assignment(assign) = &program.statements[0] {
+            assert_eq!(assign.name, "dogru_mu");
+            if let Expression::Literal(VariableValue::Bool(b)) = &assign.expression {
+                assert_eq!(*b, true);
+            } else {
+                panic!("Wrong expression");
+            }
+        } else {
+            panic!("Not assignment");
+        }
     }
 }

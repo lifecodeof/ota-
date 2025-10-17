@@ -1,0 +1,1 @@
+tamsayi = 42 metin = "Merhaba Dünya" ondalik = 3.14159 mantik = true print tamsayi print metin print ondalik print mantik

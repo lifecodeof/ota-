@@ -16,13 +16,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let input = fs::read_to_string(&args[1])?;
+    eprintln!("Input: {:?}", input);
     
     // Parse
     let program = parser::parse(&input)?;
+    eprintln!("Parsed program with {} statements", program.statements.len());
     
-    // Generate code
-    let mut codegen = codegen::CodeGen::new();
-    codegen.generate_program(&program)?;
+    // Execute
+    let mut interpreter = codegen::Interpreter::new();
+    interpreter.execute_program(&program)?;
     
     Ok(())
 }
