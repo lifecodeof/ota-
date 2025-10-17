@@ -7,12 +7,8 @@
     "speckit.implement": true
   },
   "chat.editing.autoAcceptDelay": 1,
-//   "workbench.editorAssociations": {
-//     "*.copilotmd": "vscode.markdown.preview.editor",
-//     "*.md": "vscode.markdown.preview.editor"
-//   },
   "chat.agent.maxRequests": 100,
-  "chat.edits2.enabled": true,
+//   "chat.edits2.enabled": true,
   "chat.extensionTools.enabled": false,
   "chat.implicitContext.enabled": {
     "panel": "never"
