@@ -1,7 +1,7 @@
 <!--
 Sync Impact Report:
-- Version change: 1.1.1 → 1.2.0
-- Modified sections: Core Principles (changed III to prioritize features and beginner-friendliness)
+- Version change: 1.2.0 → 1.2.1
+- Modified sections: Governance (added spec tracking requirement)
 - Templates requiring updates: none
 - Follow-up TODOs: none
 -->
@@ -40,6 +40,6 @@ Support modular design, libraries, and extensions. Allow users to build upon the
 
 ## Governance
 
-Constitution supersedes all other practices. Amendments require community consensus and documentation. All changes must verify compliance with principles. Agents are responsible for committing their generated work and changes.
+Constitution supersedes all other practices. Amendments require community consensus and documentation. All changes must verify compliance with principles. Agents are responsible for committing their generated work and changes. The language specification resides in spec.md and must be maintained alongside constitution.md. Any additions of new features or fixes to syntax logic errors must update spec.md accordingly.
 
-**Version**: 1.2.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
+**Version**: 1.2.1 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
