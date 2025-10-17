@@ -1,0 +1,27 @@
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+
+program = { SOI ~ statement* ~ EOI }
+
+statement = { variable_declaration | assignment | output_statement }
+
+variable_declaration = { identifier ~ "'" ~ type_keyword ~ "olarak" ~ "tanımla" }
+
+assignment = { identifier ~ "=" ~ expression }
+
+output_statement = { "söyle" ~ expression }
+
+expression = { identifier | literal }
+
+type_keyword = { "tamsayı" | "metin" | "ondalıklı" | "mantıksal" }
+
+literal = { string_literal | int_literal | float_literal | boolean_literal }
+
+string_literal = { "\"" ~ (!"\"" ~ ("\\\"" | !("\\" | "\"") ~ ANY))* ~ "\"" }
+
+int_literal = { ASCII_DIGIT+ }
+
+float_literal = { ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+ }
+
+boolean_literal = { "doğru" | "yanlış" }
+
+identifier = { (ASCII_ALPHANUMERIC | "_")+ }
