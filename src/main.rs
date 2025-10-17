@@ -28,7 +28,7 @@ fn main() -> Result<(), crate::error_reporting::OtagError> {
     let input = fs::read_to_string(&args.input_file).map_err(|e| crate::error_reporting::OtagError::runtime(format!("Dosya okuma hatası: {}", e), crate::location::Location::new(args.input_file.clone(), 0, 0)))?;
 
     // Parse
-    let program = parser::parse(&input)?;
+    let program = parser::parse(&input, &args.input_file)?;
 
     // Semantic analysis
     let mut analyzer = semantic::SemanticAnalyzer::new();

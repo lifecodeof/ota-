@@ -8,11 +8,9 @@
   },
   "chat.editing.autoAcceptDelay": 1,
   "chat.agent.maxRequests": 500,
-//   "chat.edits2.enabled": true,
-  "chat.extensionTools.enabled": false,
   "chat.implicitContext.enabled": {
     "panel": "never"
   },
-  "github.copilot.chat.setupTests.enabled": false,
-  "accessibility.openChatEditedFiles": false
+  "accessibility.openChatEditedFiles": false,
+  "chat.edits2.enabled": true
 }

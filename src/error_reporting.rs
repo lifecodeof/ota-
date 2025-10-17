@@ -41,6 +41,18 @@ impl OtagError {
     pub fn runtime(message: String, location: Location) -> Self {
         Self::new(ErrorType::Runtime, message, location)
     }
+
+    pub fn type_mismatch(expected: &str, found: &str, location: Location) -> Self {
+        Self::semantic(format!("Tür uyumsuzluğu: {} bekleniyordu, {} bulundu", expected, found), location)
+    }
+
+    pub fn undefined_variable(name: &str, location: Location) -> Self {
+        Self::semantic(format!("Tanımlanmamış değişken: {}", name), location)
+    }
+
+    pub fn division_by_zero(location: Location) -> Self {
+        Self::runtime("Sıfıra bölme hatası".to_string(), location)
+    }
 }
 
 impl std::fmt::Display for OtagError {

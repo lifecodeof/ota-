@@ -17,6 +17,16 @@ pub enum VariableValue {
     Array(Vec<VariableValue>),
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum ErrorType {
+    Syntax,
+    Semantic,
+    Runtime,
+    TypeMismatch,
+    UndefinedVariable,
+    DivisionByZero,
+}
+
 use crate::ast::Expression;
 
 pub fn check_array_elements_types(elements: &Vec<Expression>) -> Result<Type, String> {
