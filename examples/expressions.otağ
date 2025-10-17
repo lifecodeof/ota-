@@ -1,0 +1,8 @@
+yaş'ı tamsayı olarak tanımla
+yaş = 25
+bonus = 5
+toplam = yaş + bonus
+
+söyle yaş
+söyle bonus
+söyle toplam

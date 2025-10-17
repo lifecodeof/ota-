@@ -2,16 +2,19 @@ use std::collections::HashMap;
 use crate::types::{VariableType, VariableValue};
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct Variable {
     pub name: String,
     pub var_type: VariableType,
     pub value: Option<VariableValue>,
 }
 
+#[allow(dead_code)]
 pub struct SymbolTable {
     symbols: HashMap<String, Variable>,
 }
 
+#[allow(dead_code)]
 impl SymbolTable {
     pub fn new() -> Self {
         SymbolTable {

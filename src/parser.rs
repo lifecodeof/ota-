@@ -36,6 +36,7 @@ fn parse_statement(pair: pest::iterators::Pair<Rule>) -> Result<Statement, Box<d
 fn parse_variable_declaration(pair: pest::iterators::Pair<Rule>) -> Result<VariableDeclaration, Box<dyn std::error::Error>> {
     let mut inner = pair.into_inner();
     let name = inner.next().unwrap().as_str().to_string();
+    // "'ı" is matched but not captured
     let type_str = inner.next().unwrap().as_str();
     
     let var_type = match type_str {
@@ -238,6 +239,19 @@ mod tests {
             }
         } else {
             panic!("Not assignment");
+        }
+    }
+
+    #[test]
+    fn test_parse_variable_declaration() {
+        let input = "x'ı tamsayı olarak tanımla";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::VariableDeclaration(decl) = &program.statements[0] {
+            assert_eq!(decl.name, "x");
+            assert_eq!(decl.var_type, VariableType::Tamsayi);
+        } else {
+            panic!("Not variable declaration");
         }
     }
 }

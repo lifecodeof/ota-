@@ -1,10 +1,10 @@
-WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" | ("#" ~ (!"\n" ~ ANY)*) }
 
 program = { SOI ~ statement* ~ EOI }
 
 statement = { variable_declaration | assignment | output_statement }
 
-variable_declaration = { identifier ~ "'" ~ type_keyword ~ "olarak" ~ "tanımla" }
+variable_declaration = { identifier ~ "'ı" ~ type_keyword ~ "olarak" ~ "tanımla" }
 
 assignment = { identifier ~ "=" ~ expression }
 
@@ -16,7 +16,7 @@ term = { literal | identifier }
 
 operator = { "+" }
 
-type_keyword = { "tamsayı" | "metin" | "ondalıklı" | "mantıksal" }
+type_keyword = @{ "tamsayı" | "metin" | "ondalıklı" | "mantıksal" }
 
 literal = { string_literal | float_literal | int_literal | boolean_literal }
 
@@ -26,6 +26,6 @@ int_literal = { ASCII_DIGIT+ }
 
 float_literal = { ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+ }
 
-boolean_literal = { "doğru" | "yanlış" }
+boolean_literal = @{ "doğru" | "yanlış" }
 
-identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_") * }
+identifier = @{ (ASCII_ALPHA | "ğ" | "ü" | "ş" | "ö" | "ç" | "ı") ~ (ASCII_ALPHANUMERIC | "_" | "ğ" | "ü" | "ş" | "ö" | "ç" | "ı")* }
