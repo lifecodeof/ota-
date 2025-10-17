@@ -20,10 +20,10 @@
 
 **Purpose**: Feature-specific setup and basic extensions
 
-- [ ] T001 Extend Token enum in src/lexer.rs for array/struct syntax ([, ], {, }, ., :)
-- [ ] T002 Extend Type enum in src/types.rs for Array and Struct types
-- [ ] T003 Extend Expression enum in src/ast.rs for new AST nodes
-- [ ] T004 Extend Statement enum in src/ast.rs for struct definitions
+- [X] T001 Extend Token enum in src/lexer.rs for array/struct syntax ([, ], {, }, ., :)
+- [X] T002 Extend Type enum in src/types.rs for Array and Struct types
+- [X] T003 Extend Expression enum in src/ast.rs for new AST nodes
+- [X] T004 Extend Statement enum in src/ast.rs for struct definitions
 
 ---
 
@@ -33,13 +33,13 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Implement ArrayLiteral AST node in src/ast.rs
-- [ ] T006 [P] Implement StructLiteral AST node in src/ast.rs
-- [ ] T007 [P] Implement ArrayAccess AST node in src/ast.rs
-- [ ] T008 [P] Implement StructAccess AST node in src/ast.rs
-- [ ] T009 [P] Implement StructDefinition AST node in src/ast.rs
-- [ ] T010 Update symbol table in src/symbol_table.rs to store struct definitions
-- [ ] T011 Extend type checker in src/types.rs for array/struct validation
+- [X] T005 [P] Implement ArrayLiteral AST node in src/ast.rs
+- [X] T006 [P] Implement StructLiteral AST node in src/ast.rs
+- [X] T007 [P] Implement ArrayAccess AST node in src/ast.rs
+- [X] T008 [P] Implement StructAccess AST node in src/ast.rs
+- [X] T009 [P] Implement StructDefinition AST node in src/ast.rs
+- [X] T010 Update symbol table in src/symbol_table.rs to store struct definitions
+- [X] T011 Extend type checker in src/types.rs for array/struct validation
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -55,19 +55,19 @@
 
 **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T012 [P] [US1] Unit test for array literal parsing in tests/unit/test_parser.rs
-- [ ] T013 [P] [US1] Unit test for array access parsing in tests/unit/test_parser.rs
-- [ ] T014 [P] [US1] Unit test for array type checking in tests/unit/test_types.rs
-- [ ] T015 [P] [US1] Unit test for array code generation in tests/unit/test_codegen.rs
-- [ ] T016 [US1] Integration test for array declaration and access in tests/integration/test_arrays.rs
+- [X] T012 [P] [US1] Unit test for array literal parsing in tests/unit/test_parser.rs
+- [X] T013 [P] [US1] Unit test for array access parsing in tests/unit/test_parser.rs
+- [X] T014 [US1] Unit test for array type checking in tests/unit/test_types.rs
+- [X] T015 [US1] Unit test for array code generation in tests/unit/test_codegen.rs
+- [X] T016 [US1] Integration test for array declaration and access in tests/integration/test_arrays.rs
 
 ### Implementation for User Story 1
 
-- [ ] T017 [US1] Implement array literal parsing in src/parser.rs
-- [ ] T018 [US1] Implement array access parsing in src/parser.rs
-- [ ] T019 [US1] Implement array type checking in src/types.rs
-- [ ] T020 [US1] Implement array code generation in src/codegen.rs
-- [ ] T021 [US1] Update lexer in src/lexer.rs for array tokens
+- [X] T017 [US1] Implement array literal parsing in src/parser.rs
+- [X] T018 [US1] Implement array access parsing in src/parser.rs
+- [X] T019 [US1] Implement array type checking in src/types.rs
+- [X] T020 [US1] Implement array code generation in src/codegen.rs
+- [X] T021 [US1] Update lexer in src/lexer.rs for array tokens
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 

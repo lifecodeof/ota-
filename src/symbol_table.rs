@@ -1,12 +1,12 @@
 use std::collections::HashMap;
-use crate::types::{VariableType, VariableValue};
-use crate::ast::FunctionDefinition;
+use crate::types::{Type, VariableValue};
+use crate::ast::{FunctionDefinition, StructDefinition};
 
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct Variable {
     pub name: String,
-    pub var_type: VariableType,
+    pub var_type: Type,
     pub value: Option<VariableValue>,
 }
 
@@ -14,6 +14,7 @@ pub struct Variable {
 pub struct SymbolTable {
     scopes: Vec<HashMap<String, Variable>>,
     functions: HashMap<String, FunctionDefinition>,
+    structs: HashMap<String, StructDefinition>,
 }
 
 #[allow(dead_code)]
@@ -22,10 +23,11 @@ impl SymbolTable {
         SymbolTable {
             scopes: vec![HashMap::new()],
             functions: HashMap::new(),
+            structs: HashMap::new(),
         }
     }
 
-    pub fn insert(&mut self, name: String, var_type: VariableType) {
+    pub fn insert(&mut self, name: String, var_type: Type) {
         let variable = Variable {
             name: name.clone(),
             var_type,
@@ -42,8 +44,20 @@ impl SymbolTable {
         Ok(())
     }
 
+    pub fn insert_struct(&mut self, struct_def: StructDefinition) -> Result<(), String> {
+        if self.structs.contains_key(&struct_def.name) {
+            return Err(format!("Struct '{}' already defined", struct_def.name));
+        }
+        self.structs.insert(struct_def.name.clone(), struct_def);
+        Ok(())
+    }
+
     pub fn lookup_function(&self, name: &str) -> Option<&FunctionDefinition> {
         self.functions.get(name)
+    }
+
+    pub fn lookup_struct(&self, name: &str) -> Option<&StructDefinition> {
+        self.structs.get(name)
     }
 
     #[allow(dead_code)]

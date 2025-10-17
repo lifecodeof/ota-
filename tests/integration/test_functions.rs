@@ -50,3 +50,24 @@ söyle sonuç
     // Check compilation
     assert!(output.stderr.is_empty(), "Compilation failed: {}", String::from_utf8_lossy(&output.stderr));
 }
+
+#[test]
+fn test_array_declaration_and_access_integration() {
+    let program = r#"
+dizi = [1, 2, 3, 4, 5]
+söyle dizi[0]
+söyle dizi[2]
+"#;
+
+    // Write to temp file
+    std::fs::write("temp_array.otag", program).expect("Failed to write temp file");
+
+    // Run compiler
+    let output = Command::new("cargo")
+        .args(&["run", "--", "temp_array.otag"])
+        .output()
+        .expect("Failed to run compiler");
+
+    // Check compilation
+    assert!(output.stderr.is_empty(), "Compilation failed: {}", String::from_utf8_lossy(&output.stderr));
+}

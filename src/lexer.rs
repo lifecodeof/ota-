@@ -83,6 +83,24 @@ pub enum Token {
 
     #[token("return")]
     Return,
+
+    #[token("[")]
+    LeftBracket,
+
+    #[token("]")]
+    RightBracket,
+
+    #[token("{")]
+    LeftBrace,
+
+    #[token("}")]
+    RightBrace,
+
+    #[token(".")]
+    Dot,
+
+    #[token(":")]
+    Colon,
 }
 
 

@@ -51,10 +51,10 @@ fn parse_variable_declaration(pair: pest::iterators::Pair<Rule>) -> Result<Varia
     let type_str = inner.next().unwrap().as_str();
     
     let var_type = match type_str {
-        "tamsayı" => VariableType::Tamsayi,
-        "metin" => VariableType::Metin,
-        "ondalıklı" => VariableType::Ondalikli,
-        "mantıksal" => VariableType::Mantiksal,
+        "tamsayı" => Type::Tamsayi,
+        "metin" => Type::Metin,
+        "ondalıklı" => Type::Ondalikli,
+        "mantıksal" => Type::Mantiksal,
         _ => return Err(format!("Unknown variable type '{}'. Expected one of: tamsayı, metin, ondalıklı, mantıksal", type_str).into()),
     };
     
@@ -124,7 +124,9 @@ fn parse_term(pair: pest::iterators::Pair<Rule>) -> Result<Expression, Box<dyn s
         Rule::identifier => Ok(Expression::VariableRef(inner.as_str().to_string())),
         Rule::literal => Ok(Expression::Literal(parse_literal(inner)?)),
         Rule::function_call => Ok(Expression::FunctionCall(parse_function_call(inner)?)),
-        _ => Err(format!("Expected identifier, literal, or function call, found: {:?}", inner.as_rule()).into()),
+        Rule::array_literal => Ok(Expression::ArrayLiteral(parse_array_literal(inner)?)),
+        Rule::array_access => Ok(Expression::ArrayAccess(parse_array_access(inner)?)),
+        _ => Err(format!("Expected identifier, literal, function call, array literal, or array access, found: {:?}", inner.as_rule()).into()),
     }
 }
 
@@ -146,6 +148,26 @@ fn parse_literal(pair: pest::iterators::Pair<Rule>) -> Result<VariableValue, Box
         },
         _ => Err(format!("Unknown literal type: {:?}", inner.as_rule()).into()),
     }
+}
+
+fn parse_array_literal(pair: pest::iterators::Pair<Rule>) -> Result<ArrayLiteral, Box<dyn std::error::Error>> {
+    let mut elements = Vec::new();
+    for inner in pair.into_inner() {
+        if inner.as_rule() == Rule::expression {
+            elements.push(parse_expression(inner)?);
+        }
+    }
+    Ok(ArrayLiteral { elements, element_type: None })
+}
+
+fn parse_array_access(pair: pest::iterators::Pair<Rule>) -> Result<ArrayAccess, Box<dyn std::error::Error>> {
+    let mut inner = pair.into_inner();
+    let array_name = inner.next().unwrap().as_str().to_string();
+    let index_expr = parse_expression(inner.next().unwrap())?;
+    Ok(ArrayAccess {
+        array: Box::new(Expression::VariableRef(array_name)),
+        index: Box::new(index_expr),
+    })
 }
 
 fn parse_if_statement(pair: pest::iterators::Pair<Rule>) -> Result<IfStatement, Box<dyn std::error::Error>> {
@@ -268,13 +290,13 @@ fn parse_parameter(pair: pest::iterators::Pair<Rule>) -> Result<Parameter, Box<d
     Ok(Parameter { name, param_type })
 }
 
-fn parse_type_keyword(pair: pest::iterators::Pair<Rule>) -> Result<VariableType, Box<dyn std::error::Error>> {
+fn parse_type_keyword(pair: pest::iterators::Pair<Rule>) -> Result<Type, Box<dyn std::error::Error>> {
     let type_str = pair.as_str();
     match type_str {
-        "tamsayı" => Ok(VariableType::Tamsayi),
-        "metin" => Ok(VariableType::Metin),
-        "ondalıklı" => Ok(VariableType::Ondalikli),
-        "mantıksal" => Ok(VariableType::Mantiksal),
+        "tamsayı" => Ok(Type::Tamsayi),
+        "metin" => Ok(Type::Metin),
+        "ondalıklı" => Ok(Type::Ondalikli),
+        "mantıksal" => Ok(Type::Mantiksal),
         _ => Err(format!("Unknown type '{}'", type_str).into()),
     }
 }
@@ -426,7 +448,7 @@ mod tests {
         assert_eq!(program.statements.len(), 1);
         if let Statement::VariableDeclaration(decl) = &program.statements[0] {
             assert_eq!(decl.name, "x");
-            assert_eq!(decl.var_type, VariableType::Tamsayi);
+            assert_eq!(decl.var_type, Type::Tamsayi);
         } else {
             panic!("Not variable declaration");
         }
@@ -504,9 +526,9 @@ mod tests {
             assert_eq!(func.name, "topla");
             assert_eq!(func.parameters.len(), 2);
             assert_eq!(func.parameters[0].name, "a");
-            assert_eq!(func.parameters[0].param_type, VariableType::Tamsayi);
+            assert_eq!(func.parameters[0].param_type, Type::Tamsayi);
             assert_eq!(func.parameters[1].name, "b");
-            assert_eq!(func.parameters[1].param_type, VariableType::Tamsayi);
+            assert_eq!(func.parameters[1].param_type, Type::Tamsayi);
             assert_eq!(func.return_type, None);
             assert_eq!(func.body.len(), 1);
             if let Statement::Return(Some(_)) = &func.body[0] {
@@ -540,6 +562,63 @@ mod tests {
                 }
             } else {
                 panic!("Not function call");
+            }
+        } else {
+            panic!("Not output");
+        }
+    }
+
+    #[test]
+    fn test_parse_array_literal() {
+        let input = "x = [1, 2, 3]";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::Assignment(assign) = &program.statements[0] {
+            assert_eq!(assign.name, "x");
+            if let Expression::ArrayLiteral(array_lit) = &assign.expression {
+                assert_eq!(array_lit.elements.len(), 3);
+                if let Expression::Literal(VariableValue::Int(1)) = &array_lit.elements[0] {
+                    // ok
+                } else {
+                    panic!("First element not 1");
+                }
+                if let Expression::Literal(VariableValue::Int(2)) = &array_lit.elements[1] {
+                    // ok
+                } else {
+                    panic!("Second element not 2");
+                }
+                if let Expression::Literal(VariableValue::Int(3)) = &array_lit.elements[2] {
+                    // ok
+                } else {
+                    panic!("Third element not 3");
+                }
+            } else {
+                panic!("Not array literal");
+            }
+        } else {
+            panic!("Not assignment");
+        }
+    }
+
+    #[test]
+    fn test_parse_array_access() {
+        let input = "söyle dizi[0]";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::Output(out) = &program.statements[0] {
+            if let Expression::ArrayAccess(access) = &out.expression {
+                if let Expression::VariableRef(name) = &*access.array {
+                    assert_eq!(name, "dizi");
+                } else {
+                    panic!("Array not variable dizi");
+                }
+                if let Expression::Literal(VariableValue::Int(0)) = &*access.index {
+                    // ok
+                } else {
+                    panic!("Index not 0");
+                }
+            } else {
+                panic!("Not array access");
             }
         } else {
             panic!("Not output");

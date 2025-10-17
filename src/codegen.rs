@@ -45,6 +45,7 @@ impl Interpreter {
                     Ok(None)
                 }
             },
+            Statement::StructDefinition(_) => todo!(),
         }
     }
 
@@ -52,10 +53,11 @@ impl Interpreter {
         self.symbol_table.insert(decl.name.clone(), decl.var_type.clone());
         // Initialize with default values
         let default_value = match decl.var_type {
-            VariableType::Tamsayi => VariableValue::Int(0),
-            VariableType::Metin => VariableValue::String(String::new()),
-            VariableType::Ondalikli => VariableValue::Float(0.0),
-            VariableType::Mantiksal => VariableValue::Bool(false),
+            Type::Tamsayi => VariableValue::Int(0),
+            Type::Metin => VariableValue::String(String::new()),
+            Type::Ondalikli => VariableValue::Float(0.0),
+            Type::Mantiksal => VariableValue::Bool(false),
+            _ => return Err(format!("Unsupported type for variable declaration: {:?}", decl.var_type)),
         };
         self.variables.insert(decl.name.clone(), default_value);
         Ok(None)
@@ -74,6 +76,7 @@ impl Interpreter {
             VariableValue::String(s) => println!("{}", s),
             VariableValue::Float(f) => println!("{}", f),
             VariableValue::Bool(b) => println!("{}", if b { "doğru" } else { "yanlış" }),
+            VariableValue::Array(arr) => println!("{:?}", arr),
         }
         Ok(None)
     }
@@ -123,6 +126,33 @@ impl Interpreter {
                 }
                 result.ok_or_else(|| format!("Function '{}' did not return a value", call.name))
             },
+            Expression::ArrayLiteral(array_lit) => {
+                let mut values = Vec::new();
+                for elem in &array_lit.elements {
+                    values.push(self.evaluate_expression(elem)?);
+                }
+                Ok(VariableValue::Array(values))
+            },
+            Expression::ArrayAccess(access) => {
+                let array_val = self.evaluate_expression(&access.array)?;
+                let index_val = self.evaluate_expression(&access.index)?;
+                if let VariableValue::Array(arr) = array_val {
+                    if let VariableValue::Int(idx) = index_val {
+                        if idx >= 0 && (idx as usize) < arr.len() {
+                            Ok(arr[idx as usize].clone())
+                        } else {
+                            Err("Array index out of bounds".to_string())
+                        }
+                    } else {
+                        Err("Array index must be integer".to_string())
+                    }
+                } else {
+                    Err("Not an array".to_string())
+                }
+            },
+            Expression::StructLiteral(_) => todo!(),
+            Expression::StructAccess(_) => todo!(),
+            Expression::StructAccess(_) => todo!(),
         }
     }
 
@@ -244,7 +274,7 @@ mod tests {
         // Declare x = 10
         let decl = VariableDeclaration {
             name: "x".to_string(),
-            var_type: VariableType::Tamsayi,
+            var_type: Type::Tamsayi,
         };
         interpreter.execute_variable_declaration(&decl).unwrap();
         interpreter.execute_assignment(&Assignment {
@@ -279,7 +309,7 @@ mod tests {
         // Declare counter = 0
         let decl = VariableDeclaration {
             name: "counter".to_string(),
-            var_type: VariableType::Tamsayi,
+            var_type: Type::Tamsayi,
         };
         interpreter.execute_variable_declaration(&decl).unwrap();
         interpreter.execute_assignment(&Assignment {

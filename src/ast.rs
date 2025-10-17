@@ -1,4 +1,4 @@
-use crate::types::{VariableType, VariableValue};
+use crate::types::{Type, VariableValue};
 
 #[derive(Debug, Clone)]
 pub struct Program {
@@ -19,12 +19,13 @@ pub enum Statement {
     FunctionDefinition(FunctionDefinition),
     #[allow(dead_code)]
     Return(Option<Expression>),
+    StructDefinition(StructDefinition),
 }
 
 #[derive(Debug, Clone)]
 pub struct VariableDeclaration {
     pub name: String,
-    pub var_type: VariableType,
+    pub var_type: Type,
 }
 
 #[derive(Debug, Clone)]
@@ -88,7 +89,7 @@ pub struct ForLoop {
 pub struct FunctionDefinition {
     pub name: String,
     pub parameters: Vec<Parameter>,
-    pub return_type: Option<VariableType>,
+    pub return_type: Option<Type>,
     pub body: Vec<Statement>,
 }
 
@@ -96,7 +97,49 @@ pub struct FunctionDefinition {
 #[allow(dead_code)]
 pub struct Parameter {
     pub name: String,
-    pub param_type: VariableType,
+    pub param_type: Type,
+}
+
+#[derive(Debug, Clone)]
+pub struct ArrayLiteral {
+    pub elements: Vec<Expression>,
+    pub element_type: Option<Type>,
+}
+
+#[derive(Debug, Clone)]
+pub struct StructLiteral {
+    pub struct_name: String,
+    pub fields: Vec<FieldAssignment>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FieldAssignment {
+    pub name: String,
+    pub value: Expression,
+}
+
+#[derive(Debug, Clone)]
+pub struct ArrayAccess {
+    pub array: Box<Expression>,
+    pub index: Box<Expression>,
+}
+
+#[derive(Debug, Clone)]
+pub struct StructAccess {
+    pub struct_expr: Box<Expression>,
+    pub field_name: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct StructDefinition {
+    pub name: String,
+    pub fields: Vec<FieldDefinition>,
+}
+
+#[derive(Debug, Clone)]
+pub struct FieldDefinition {
+    pub name: String,
+    pub field_type: Type,
 }
 
 #[derive(Debug, Clone)]
@@ -106,6 +149,10 @@ pub enum Expression {
     BinaryOp(Box<Expression>, BinaryOperator, Box<Expression>),
     #[allow(dead_code)]
     FunctionCall(FunctionCall),
+    ArrayLiteral(ArrayLiteral),
+    StructLiteral(StructLiteral),
+    ArrayAccess(ArrayAccess),
+    StructAccess(StructAccess),
 }
 
 #[derive(Debug, Clone)]

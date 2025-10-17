@@ -12,13 +12,17 @@ output_statement = { "söyle" ~ expression }
 
 expression = { term ~ (operator ~ term)* }
 
-term = { function_call | literal | identifier }
+term = { array_access | array_literal | function_call | literal | identifier }
+
+array_access = { identifier ~ "[" ~ expression ~ "]" }
 
 operator = { "<=" | "<" | ">=" | ">" | "+" }
 
 type_keyword = @{ "tamsayı" | "metin" | "ondalıklı" | "mantıksal" }
 
-literal = { string_literal | float_literal | int_literal | boolean_literal }
+literal = { array_literal | string_literal | float_literal | int_literal | boolean_literal }
+
+array_literal = { "[" ~ (expression ~ ("," ~ expression)*)? ~ "]" }
 
 string_literal = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
 
