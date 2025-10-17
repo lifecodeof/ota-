@@ -29,6 +29,11 @@ fn parse_statement(pair: pest::iterators::Pair<Rule>) -> Result<Statement, Box<d
         Rule::variable_declaration => Ok(Statement::VariableDeclaration(parse_variable_declaration(inner)?)),
         Rule::assignment => Ok(Statement::Assignment(parse_assignment(inner)?)),
         Rule::output_statement => Ok(Statement::Output(parse_output_statement(inner)?)),
+        Rule::if_statement => Ok(Statement::IfStatement(parse_if_statement(inner)?)),
+        Rule::while_statement => Ok(Statement::WhileLoop(parse_while_statement(inner)?)),
+        Rule::for_statement => Ok(Statement::ForLoop(parse_for_statement(inner)?)),
+        Rule::break_statement => Ok(Statement::BreakStatement),
+        Rule::continue_statement => Ok(Statement::ContinueStatement),
         _ => Err(format!("Unknown statement type: {:?}", inner.as_rule()).into()),
     }
 }
@@ -126,6 +131,71 @@ fn parse_literal(pair: pest::iterators::Pair<Rule>) -> Result<VariableValue, Box
         },
         _ => Err(format!("Unknown literal type: {:?}", inner.as_rule()).into()),
     }
+}
+
+fn parse_if_statement(pair: pest::iterators::Pair<Rule>) -> Result<IfStatement, Box<dyn std::error::Error>> {
+    let mut inner = pair.into_inner();
+    // Skip "eğer"
+    let condition_pair = inner.next().unwrap();
+    let condition = Condition { expression: Box::new(parse_expression(condition_pair)?) };
+    // Skip "ise"
+    let then_block = parse_control_block(inner.next().unwrap())?;
+    let else_block = if let Some(yoksa_pair) = inner.next() {
+        Some(parse_control_block(yoksa_pair)?)
+    } else {
+        None
+    };
+    // Skip "son"
+    Ok(IfStatement { condition, then_block, else_block })
+}
+
+fn parse_while_statement(pair: pest::iterators::Pair<Rule>) -> Result<WhileLoop, Box<dyn std::error::Error>> {
+    let mut inner = pair.into_inner();
+    // Skip "döngü"
+    let condition_pair = inner.next().unwrap();
+    let condition = Condition { expression: Box::new(parse_expression(condition_pair)?) };
+    // Skip "ise"
+    let body = parse_control_block(inner.next().unwrap())?;
+    // Skip "son"
+    Ok(WhileLoop { condition, body })
+}
+
+fn parse_for_statement(pair: pest::iterators::Pair<Rule>) -> Result<ForLoop, Box<dyn std::error::Error>> {
+    let mut inner = pair.into_inner();
+    // Skip "için"
+    let var_name = inner.next().unwrap().as_str().to_string();
+    let loop_variable = LoopVariable { name: var_name, is_auto_generated: false };
+    // Skip "in"
+    let range_spec = inner.next().unwrap();
+    let (range_start, range_end, step) = parse_range_spec(range_spec)?;
+    // Skip "ise"
+    let body = parse_control_block(inner.next().unwrap())?;
+    // Skip "son"
+    Ok(ForLoop { loop_variable, range_start, range_end, step, body })
+}
+
+fn parse_control_block(pair: pest::iterators::Pair<Rule>) -> Result<ControlBlock, Box<dyn std::error::Error>> {
+    let mut statements = Vec::new();
+    for inner in pair.into_inner() {
+        if inner.as_rule() == Rule::statement {
+            statements.push(parse_statement(inner)?);
+        }
+    }
+    Ok(ControlBlock { statements })
+}
+
+fn parse_range_spec(pair: pest::iterators::Pair<Rule>) -> Result<(Box<Expression>, Box<Expression>, Option<Box<Expression>>), Box<dyn std::error::Error>> {
+    let mut inner = pair.into_inner();
+    let start = Box::new(parse_expression(inner.next().unwrap())?);
+    // Skip "dan"
+    let end = Box::new(parse_expression(inner.next().unwrap())?);
+    let step = if let Some(step_pair) = inner.next() {
+        // Skip "adım"
+        Some(Box::new(parse_expression(step_pair)?))
+    } else {
+        None
+    };
+    Ok((start, end, step))
 }
 
 #[cfg(test)]
