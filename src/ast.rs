@@ -10,11 +10,11 @@ pub enum Statement {
     VariableDeclaration(VariableDeclaration),
     Assignment(Assignment),
     Output(OutputStatement),
-    IfStatement(IfStatement),
+    If(IfStatement),
     WhileLoop(WhileLoop),
     ForLoop(ForLoop),
-    BreakStatement,
-    ContinueStatement,
+    Break,
+    Continue,
 }
 
 #[derive(Debug, Clone)]
@@ -46,7 +46,9 @@ pub struct Condition {
 
 #[derive(Debug, Clone)]
 pub struct LoopVariable {
+    #[allow(dead_code)]
     pub name: String,
+    #[allow(dead_code)]
     pub is_auto_generated: bool,
 }
 
@@ -65,10 +67,15 @@ pub struct WhileLoop {
 
 #[derive(Debug, Clone)]
 pub struct ForLoop {
+    #[allow(dead_code)]
     pub loop_variable: LoopVariable,
+    #[allow(dead_code)]
     pub range_start: Box<Expression>,
+    #[allow(dead_code)]
     pub range_end: Box<Expression>,
+    #[allow(dead_code)]
     pub step: Option<Box<Expression>>,
+    #[allow(dead_code)]
     pub body: ControlBlock,
 }
 

@@ -28,11 +28,11 @@ impl Interpreter {
             Statement::VariableDeclaration(decl) => self.execute_variable_declaration(decl),
             Statement::Assignment(assign) => self.execute_assignment(assign),
             Statement::Output(output) => self.execute_output_statement(output),
-            Statement::IfStatement(if_stmt) => self.execute_if_statement(if_stmt),
+            Statement::If(if_stmt) => self.execute_if_statement(if_stmt),
             Statement::WhileLoop(while_loop) => self.execute_while_loop(while_loop),
             Statement::ForLoop(for_loop) => self.execute_for_loop(for_loop),
-            Statement::BreakStatement => self.execute_break(),
-            Statement::ContinueStatement => self.execute_continue(),
+            Statement::Break => self.execute_break(),
+            Statement::Continue => self.execute_continue(),
         }
     }
 
@@ -175,7 +175,7 @@ impl Interpreter {
         Ok(())
     }
 
-    fn execute_for_loop(&mut self, for_loop: &ForLoop) -> Result<(), String> {
+    fn execute_for_loop(&mut self, _for_loop: &ForLoop) -> Result<(), String> {
         todo!("Implement for loop execution")
     }
 

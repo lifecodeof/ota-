@@ -7,6 +7,9 @@ use crate::types::*;
 #[grammar = "src/grammar.pest"]
 pub struct OtagParser;
 
+/// Type alias for range specification parsing result
+type RangeSpecResult = Result<(Box<Expression>, Box<Expression>, Option<Box<Expression>>), Box<dyn std::error::Error>>;
+
 pub fn parse(input: &str) -> Result<Program, Box<dyn std::error::Error>> {
     let mut pairs = OtagParser::parse(Rule::program, input)?;
     
@@ -29,11 +32,11 @@ fn parse_statement(pair: pest::iterators::Pair<Rule>) -> Result<Statement, Box<d
         Rule::variable_declaration => Ok(Statement::VariableDeclaration(parse_variable_declaration(inner)?)),
         Rule::assignment => Ok(Statement::Assignment(parse_assignment(inner)?)),
         Rule::output_statement => Ok(Statement::Output(parse_output_statement(inner)?)),
-        Rule::if_statement => Ok(Statement::IfStatement(parse_if_statement(inner)?)),
+        Rule::if_statement => Ok(Statement::If(parse_if_statement(inner)?)),
         Rule::while_statement => Ok(Statement::WhileLoop(parse_while_statement(inner)?)),
         Rule::for_statement => Ok(Statement::ForLoop(parse_for_statement(inner)?)),
-        Rule::break_statement => Ok(Statement::BreakStatement),
-        Rule::continue_statement => Ok(Statement::ContinueStatement),
+        Rule::break_statement => Ok(Statement::Break),
+        Rule::continue_statement => Ok(Statement::Continue),
         _ => Err(format!("Unknown statement type: {:?}", inner.as_rule()).into()),
     }
 }
@@ -194,7 +197,7 @@ fn parse_control_block(pair: pest::iterators::Pair<Rule>) -> Result<ControlBlock
     Ok(ControlBlock { statements })
 }
 
-fn parse_range_spec(pair: pest::iterators::Pair<Rule>) -> Result<(Box<Expression>, Box<Expression>, Option<Box<Expression>>), Box<dyn std::error::Error>> {
+fn parse_range_spec(pair: pest::iterators::Pair<Rule>) -> RangeSpecResult {
     let mut inner = pair.into_inner();
     let start = Box::new(parse_expression(inner.next().unwrap())?);
     // Skip "dan"
@@ -340,7 +343,7 @@ mod tests {
         let input = "eğer x > 5 ise\nsöyle \"Büyük\"\nson";
         let program = parse(input).unwrap();
         assert_eq!(program.statements.len(), 1);
-        if let Statement::IfStatement(if_stmt) = &program.statements[0] {
+        if let Statement::If(if_stmt) = &program.statements[0] {
             // Check condition
             if let Expression::BinaryOp(left, BinaryOperator::GreaterThan, right) = &*if_stmt.condition.expression {
                 if let Expression::VariableRef(var) = &**left {
