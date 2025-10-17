@@ -7,7 +7,7 @@
     "speckit.implement": true
   },
   "chat.editing.autoAcceptDelay": 1,
-  "chat.agent.maxRequests": 100,
+  "chat.agent.maxRequests": 500,
 //   "chat.edits2.enabled": true,
   "chat.extensionTools.enabled": false,
   "chat.implicitContext.enabled": {

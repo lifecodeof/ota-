@@ -24,21 +24,21 @@ Otağ is a Turkish-localized programming language designed to provide an intuiti
 
 ### 🎯 Immediate Priorities (Next 3 Months)
 
-#### 005-add-error-handling
+#### add-error-handling
 **Goal**: Robust error handling with Turkish error messages
 - Custom error types for compilation and runtime errors
 - Turkish-localized error messages
 - Stack traces with source location information
 - Recovery mechanisms for syntax errors
 
-#### 006-add-standard-library
+#### add-standard-library
 **Goal**: Essential standard library functions
 - Mathematical functions (`sqrt`, `pow`, `sin`, `cos`)
 - String manipulation utilities
 - Input/output functions beyond `söyle`
 - Basic file operations
 
-#### 007-improve-type-system
+#### improve-type-system
 **Goal**: Enhanced type safety and inference
 - Type inference for variable declarations
 - Generic types and type parameters
@@ -47,21 +47,21 @@ Otağ is a Turkish-localized programming language designed to provide an intuiti
 
 ### 📋 Medium-term Goals (2025 Q4 - 2026 Q1)
 
-#### 008-add-modules-system
+#### add-modules-system
 **Goal**: Code organization and reusability
 - Module imports and exports
 - Package management system
 - Namespace resolution
 - Library ecosystem foundation
 
-#### 009-add-memory-management
+#### add-memory-management
 **Goal**: Efficient memory handling
 - Reference counting or garbage collection
 - Memory safety guarantees
 - Performance optimizations
 - Memory profiling tools
 
-#### 010-add-concurrency
+#### add-concurrency
 **Goal**: Concurrent programming support
 - Goroutine-like lightweight threads
 - Channel-based communication
@@ -72,21 +72,21 @@ Otağ is a Turkish-localized programming language designed to provide an intuiti
 
 ### 🏗️ Infrastructure Goals
 
-#### 011-package-manager
+#### package-manager
 **Goal**: Official package manager for Otağ
 - Dependency resolution
 - Package publishing workflow
 - Version management
 - Security auditing
 
-#### 012-language-server
+#### language-server
 **Goal**: IDE support and developer experience
 - LSP (Language Server Protocol) implementation
 - Syntax highlighting
 - IntelliSense/autocomplete
 - Refactoring tools
 
-#### 013-documentation-generator
+#### documentation-generator
 **Goal**: Automated documentation tools
 - API documentation generation
 - Interactive tutorials
@@ -95,14 +95,14 @@ Otağ is a Turkish-localized programming language designed to provide an intuiti
 
 ### 🎓 Educational Features
 
-#### 014-add-tutorial-system
+#### add-tutorial-system
 **Goal**: Integrated learning experience
 - Interactive REPL with tutorials
 - Progressive difficulty levels
 - Built-in code challenges
 - Learning path recommendations
 
-#### 015-add-debugger
+#### add-debugger
 **Goal**: Debugging and development tools
 - Step-through debugging
 - Variable inspection
@@ -113,14 +113,14 @@ Otağ is a Turkish-localized programming language designed to provide an intuiti
 
 ### 🚀 Performance & Scale
 
-#### 016-llvm-codegen
+#### llvm-codegen
 **Goal**: Native code generation
 - LLVM backend implementation
 - JIT compilation
 - AOT compilation options
 - Cross-platform binary generation
 
-#### 017-add-optimization
+#### add-optimization
 **Goal**: Performance optimizations
 - Advanced compiler optimizations
 - Memory layout optimization
@@ -129,14 +129,14 @@ Otağ is a Turkish-localized programming language designed to provide an intuiti
 
 ### 🌐 Web & Cross-Platform
 
-#### 018-web-assembly
+#### web-assembly
 **Goal**: Web deployment support
 - WebAssembly compilation target
 - Browser-based execution
 - Web API bindings
 - Progressive Web App support
 
-#### 019-cross-platform-gui
+#### cross-platform-gui
 **Goal**: Native GUI framework
 - Cross-platform GUI toolkit
 - Turkish UI components
@@ -145,14 +145,14 @@ Otağ is a Turkish-localized programming language designed to provide an intuiti
 
 ### 🔬 Advanced Language Features
 
-#### 020-add-macros
+#### add-macros
 **Goal**: Metaprogramming capabilities
 - Compile-time code generation
 - Domain-specific language support
 - Code analysis and transformation
 - Plugin system
 
-#### 021-add-generics
+#### add-generics
 **Goal**: Generic programming
 - Parametric polymorphism
 - Type constraints
@@ -163,14 +163,14 @@ Otağ is a Turkish-localized programming language designed to provide an intuiti
 
 ### 🏢 Enterprise Features
 
-#### 022-enterprise-security
+#### enterprise-security
 **Goal**: Security and compliance
 - Security sandboxing
 - Audit logging
 - Compliance certifications
 - Enterprise integration APIs
 
-#### 023-cloud-native
+#### cloud-native
 **Goal**: Cloud deployment and orchestration
 - Container optimization
 - Serverless function support
@@ -179,14 +179,14 @@ Otağ is a Turkish-localized programming language designed to provide an intuiti
 
 ### 📊 Data & Analytics
 
-#### 024-data-processing
+#### data-processing
 **Goal**: Big data and analytics support
 - Distributed computing primitives
 - Data pipeline DSL
 - Statistical analysis libraries
 - Machine learning integrations
 
-#### 025-database-integration
+#### database-integration
 **Goal**: Native database support
 - ORM (Object-Relational Mapping)
 - Query language integration

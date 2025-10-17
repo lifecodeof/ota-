@@ -140,6 +140,10 @@ function Get-BranchName {
 if ($ShortName) {
     # Use provided short name, just clean it up
     $branchSuffix = $ShortName.ToLower() -replace '[^a-z0-9]', '-' -replace '-{2,}', '-' -replace '^-', '' -replace '-$', ''
+    # If short name prefixed with feature number, remove it
+    if ($branchSuffix -match '^\d{3}-(.+)$') {
+        $branchSuffix = $matches[1]
+    }
 } else {
     # Generate from description with smart filtering
     $branchSuffix = Get-BranchName -Description $featureDesc

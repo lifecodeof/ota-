@@ -47,6 +47,9 @@ language without modifying core.
 
 ## Development Workflow
 
+IMPORTANT: Do not forget to mark tasks as done and commit changes after
+completing each step.
+
 ### Test-Driven Development (TDD)
 
 At Otağ, we embrace Test-Driven Development as our core development methodology.
@@ -62,7 +65,7 @@ Our standard development workflow follows this disciplined cycle:
 3. **Compile (fix)**: Run the compiler and fix any errors
 4. **Test (success)**: Verify the test passes and all existing tests still work
 5. **Lint (fix)**: Run linters and fix any style or quality issues
-6. **Commit**: Commit the changes with a clear, descriptive message
+6. **Commit**: Commit the changes using git with a clear, descriptive message
 7. **Mark as done**: Update task tracking to reflect completion
 
 #### Why TDD?
