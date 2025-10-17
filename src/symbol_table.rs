@@ -31,10 +31,12 @@ impl SymbolTable {
         self.symbols.insert(name, variable);
     }
 
+    #[allow(dead_code)]
     pub fn lookup(&self, name: &str) -> Option<&Variable> {
         self.symbols.get(name)
     }
 
+    #[allow(dead_code)]
     pub fn update_value(&mut self, name: &str, value: VariableValue) {
         if let Some(var) = self.symbols.get_mut(name) {
             var.value = Some(value);

@@ -59,10 +59,11 @@ Our standard development workflow follows this disciplined cycle:
 
 1. **Test (fail)**: Write a failing test that defines the desired behavior
 2. **Implement**: Write the minimal code to make the test pass
-4. **Compile (fix)**: Run the compiler and fix any errors
-3. **Test (success)**: Verify the test passes and all existing tests still work
-4. **Lint (fix)**: Run linters and fix any style or quality issues
-5. **Commit**: Commit the changes with a clear, descriptive message
+3. **Compile (fix)**: Run the compiler and fix any errors
+4. **Test (success)**: Verify the test passes and all existing tests still work
+5. **Lint (fix)**: Run linters and fix any style or quality issues
+6. **Commit**: Commit the changes with a clear, descriptive message
+7. **Mark as done**: Update task tracking to reflect completion
 
 #### Why TDD?
 

@@ -29,7 +29,7 @@ fn parse_statement(pair: pest::iterators::Pair<Rule>) -> Result<Statement, Box<d
         Rule::variable_declaration => Ok(Statement::VariableDeclaration(parse_variable_declaration(inner)?)),
         Rule::assignment => Ok(Statement::Assignment(parse_assignment(inner)?)),
         Rule::output_statement => Ok(Statement::Output(parse_output_statement(inner)?)),
-        _ => Err("Unknown statement".into()),
+        _ => Err(format!("Unknown statement type: {:?}", inner.as_rule()).into()),
     }
 }
 
@@ -44,7 +44,7 @@ fn parse_variable_declaration(pair: pest::iterators::Pair<Rule>) -> Result<Varia
         "metin" => VariableType::Metin,
         "ondalıklı" => VariableType::Ondalikli,
         "mantıksal" => VariableType::Mantiksal,
-        _ => return Err("Unknown type".into()),
+        _ => return Err(format!("Unknown variable type '{}'. Expected one of: tamsayı, metin, ondalıklı, mantıksal", type_str).into()),
     };
     
     Ok(VariableDeclaration { name, var_type })
@@ -77,12 +77,12 @@ fn parse_expression(pair: pest::iterators::Pair<Rule>) -> Result<Expression, Box
             Rule::operator => {
                 ops.push(BinaryOperator::Add);
             }
-            _ => return Err("Unexpected in expression".into()),
+            _ => return Err(format!("Unexpected token in expression: {:?}", inner.as_rule()).into()),
         }
     }
 
     if terms.is_empty() {
-        return Err("Empty expression".into());
+        return Err("Expression cannot be empty".into());
     }
 
     if terms.len() == 1 {
@@ -104,7 +104,7 @@ fn parse_term(pair: pest::iterators::Pair<Rule>) -> Result<Expression, Box<dyn s
     match inner.as_rule() {
         Rule::identifier => Ok(Expression::VariableRef(inner.as_str().to_string())),
         Rule::literal => Ok(Expression::Literal(parse_literal(inner)?)),
-        _ => Err("Unknown term".into()),
+        _ => Err(format!("Expected identifier or literal, found: {:?}", inner.as_rule()).into()),
     }
 }
 
@@ -124,7 +124,7 @@ fn parse_literal(pair: pest::iterators::Pair<Rule>) -> Result<VariableValue, Box
             let val = s.trim() == "doğru";
             Ok(VariableValue::Bool(val))
         },
-        _ => Err("Unknown literal".into()),
+        _ => Err(format!("Unknown literal type: {:?}", inner.as_rule()).into()),
     }
 }
 

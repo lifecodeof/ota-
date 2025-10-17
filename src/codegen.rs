@@ -86,7 +86,7 @@ impl Interpreter {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Int(l + r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Float(l + r)),
             (VariableValue::String(l), VariableValue::String(r)) => Ok(VariableValue::String(l + &r)),
-            _ => Err("Cannot add values of different types".to_string()),
+            (left_val, right_val) => Err(format!("Cannot add values of types {:?} and {:?}. Addition is only supported between matching numeric types or strings.", left_val, right_val)),
         }
     }
 }
