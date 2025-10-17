@@ -7,9 +7,16 @@
     "speckit.implement": true
   },
   "chat.editing.autoAcceptDelay": 1,
-  "workbench.editorAssociations": {
-    "*.copilotmd": "vscode.markdown.preview.editor",
-    "*.md": "vscode.markdown.preview.editor"
-},
-"chat.agent.maxRequests": 100
+//   "workbench.editorAssociations": {
+//     "*.copilotmd": "vscode.markdown.preview.editor",
+//     "*.md": "vscode.markdown.preview.editor"
+//   },
+  "chat.agent.maxRequests": 100,
+  "chat.edits2.enabled": true,
+  "chat.extensionTools.enabled": false,
+  "chat.implicitContext.enabled": {
+    "panel": "never"
+  },
+  "github.copilot.chat.setupTests.enabled": false,
+  "accessibility.openChatEditedFiles": false
 }

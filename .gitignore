@@ -15,5 +15,4 @@ release/
 Thumbs.db
 *.tmp
 *.swp
-.vscode/
 .idea/
