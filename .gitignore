@@ -1,0 +1,19 @@
+# Rust
+target/
+debug/
+release/
+*.rs.bk
+*.rlib
+*.profraw
+*.profdata
+*.idea/
+*.log
+.env*
+
+# Universal
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/

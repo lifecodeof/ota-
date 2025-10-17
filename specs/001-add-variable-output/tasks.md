@@ -32,10 +32,10 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Define type system in otağ-compiler/src/types.rs
-- [ ] T005 Define AST nodes in otağ-compiler/src/ast.rs
-- [ ] T006 Setup basic LLVM context in otağ-compiler/src/codegen.rs
-- [ ] T007 Create symbol table in otağ-compiler/src/symbol_table.rs
+- [x] T004 Define type system in otağ-compiler/src/types.rs
+- [x] T005 Define AST nodes in otağ-compiler/src/ast.rs
+- [x] T006 Setup basic LLVM context in otağ-compiler/src/codegen.rs
+- [x] T007 Create symbol table in otağ-compiler/src/symbol_table.rs
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -49,12 +49,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Implement lexer with Turkish keywords in otağ-compiler/src/lexer.rs
-- [ ] T009 [US1] Add parser rules for variable declaration in otağ-compiler/src/parser.rs
-- [ ] T010 [US1] Add codegen for variable allocation in otağ-compiler/src/codegen.rs
-- [ ] T011 [US1] Add parser rules for output statement in otağ-compiler/src/parser.rs
-- [ ] T012 [US1] Add codegen for output (printf) in otağ-compiler/src/codegen.rs
-- [ ] T013 [US1] Integrate lexer, parser, codegen in otağ-compiler/src/main.rs
+- [x] T008 [US1] Implement lexer with Turkish keywords in otağ-compiler/src/lexer.rs
+- [x] T009 [US1] Add parser rules for variable declaration in otağ-compiler/src/parser.rs
+- [x] T010 [US1] Add codegen for variable allocation in otağ-compiler/src/codegen.rs
+- [x] T011 [US1] Add parser rules for output statement in otağ-compiler/src/parser.rs
+- [x] T012 [US1] Add codegen for output (printf) in otağ-compiler/src/codegen.rs
+- [x] T013 [US1] Integrate lexer, parser, codegen in otağ-compiler/src/main.rs
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
