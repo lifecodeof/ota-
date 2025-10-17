@@ -78,11 +78,11 @@ pub enum Token {
     #[token("in")]
     In,
 
-    #[token(">=")]
-    GreaterThanOrEqual,
+    #[token("<=")]
+    LessThanOrEqual,
 
-    #[token(">")]
-    GreaterThan,
+    #[token("<")]
+    LessThan,
 }
 
 

@@ -84,4 +84,6 @@ pub enum BinaryOperator {
     Add,
     GreaterThan,
     GreaterThanOrEqual,
+    LessThan,
+    LessThanOrEqual,
 }

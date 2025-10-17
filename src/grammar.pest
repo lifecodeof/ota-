@@ -14,7 +14,7 @@ expression = { term ~ (operator ~ term)* }
 
 term = { literal | identifier }
 
-operator = { ">=" | ">" | "+" }
+operator = { "<=" | "<" | ">=" | ">" | "+" }
 
 type_keyword = @{ "tamsayı" | "metin" | "ondalıklı" | "mantıksal" }
 

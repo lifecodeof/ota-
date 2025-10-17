@@ -75,15 +75,15 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T016 [P] [US2] Unit tests for while loop parsing in tests/parser_tests.rs
-- [ ] T017 [P] [US2] Unit tests for while loop execution in tests/codegen_tests.rs
-- [ ] T018 [P] [US2] Integration test for while loop programs in tests/integration_tests.rs
+- [x] T016 [P] [US2] Unit tests for while loop parsing in tests/parser_tests.rs
+- [x] T017 [P] [US2] Unit tests for while loop execution in tests/codegen_tests.rs
+- [x] T018 [P] [US2] Integration test for while loop programs in tests/integration_tests.rs
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Implement while_loop parsing in src/parser.rs
-- [ ] T020 [US2] Implement while_loop execution with infinite loop protection in src/codegen.rs
-- [ ] T021 [US2] Add while loop example to examples/loops.otağ
+- [x] T019 [US2] Implement while_loop parsing in src/parser.rs
+- [x] T020 [US2] Implement while_loop execution with infinite loop protection in src/codegen.rs
+- [x] T021 [US2] Add while loop example to examples/loops.otağ
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 

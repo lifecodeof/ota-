@@ -85,6 +85,8 @@ impl Interpreter {
             BinaryOperator::Add => self.add_values(left, right),
             BinaryOperator::GreaterThan => self.compare_greater(left, right),
             BinaryOperator::GreaterThanOrEqual => self.compare_greater_equal(left, right),
+            BinaryOperator::LessThan => self.compare_less(left, right),
+            BinaryOperator::LessThanOrEqual => self.compare_less_equal(left, right),
         }
     }
 
@@ -113,6 +115,22 @@ impl Interpreter {
         }
     }
 
+    fn compare_less(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+        match (left, right) {
+            (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l < r)),
+            (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l < r)),
+            (left_val, right_val) => Err(format!("Cannot compare values of types {:?} and {:?} with <. Comparison is only supported between matching numeric types.", left_val, right_val)),
+        }
+    }
+
+    fn compare_less_equal(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+        match (left, right) {
+            (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l <= r)),
+            (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l <= r)),
+            (left_val, right_val) => Err(format!("Cannot compare values of types {:?} and {:?} with <=. Comparison is only supported between matching numeric types.", left_val, right_val)),
+        }
+    }
+
     fn execute_control_block(&mut self, block: &ControlBlock) -> Result<(), String> {
         for statement in &block.statements {
             self.execute_statement(statement)?;
@@ -135,7 +153,26 @@ impl Interpreter {
     }
 
     fn execute_while_loop(&mut self, while_loop: &WhileLoop) -> Result<(), String> {
-        todo!("Implement while loop execution")
+        let mut iterations = 0;
+        const MAX_ITERATIONS: usize = 10000; // Prevent infinite loops
+
+        loop {
+            if iterations >= MAX_ITERATIONS {
+                return Err("While loop exceeded maximum iterations (10000). Possible infinite loop.".to_string());
+            }
+
+            let condition_value = self.evaluate_expression(&while_loop.condition.expression)?;
+            if let VariableValue::Bool(cond) = condition_value {
+                if !cond {
+                    break;
+                }
+                self.execute_control_block(&while_loop.body)?;
+                iterations += 1;
+            } else {
+                return Err("While loop condition must evaluate to a boolean".to_string());
+            }
+        }
+        Ok(())
     }
 
     fn execute_for_loop(&mut self, for_loop: &ForLoop) -> Result<(), String> {
@@ -188,5 +225,49 @@ mod tests {
 
         interpreter.execute_if_statement(&if_stmt).unwrap();
         // Should have printed "Büyük"
+    }
+
+    #[test]
+    fn test_execute_while_loop() {
+        let mut interpreter = Interpreter::new();
+        // Declare counter = 0
+        let decl = VariableDeclaration {
+            name: "counter".to_string(),
+            var_type: VariableType::Tamsayi,
+        };
+        interpreter.execute_variable_declaration(&decl).unwrap();
+        interpreter.execute_assignment(&Assignment {
+            name: "counter".to_string(),
+            expression: Expression::Literal(VariableValue::Int(0)),
+        }).unwrap();
+
+        // While counter < 3, increment counter and output its value
+        let while_loop = WhileLoop {
+            condition: Condition {
+                expression: Box::new(Expression::BinaryOp(
+                    Box::new(Expression::VariableRef("counter".to_string())),
+                    BinaryOperator::LessThan,
+                    Box::new(Expression::Literal(VariableValue::Int(3))),
+                )),
+            },
+            body: ControlBlock {
+                statements: vec![
+                    Statement::Output(OutputStatement {
+                        expression: Expression::VariableRef("counter".to_string()),
+                    }),
+                    Statement::Assignment(Assignment {
+                        name: "counter".to_string(),
+                        expression: Expression::BinaryOp(
+                            Box::new(Expression::VariableRef("counter".to_string())),
+                            BinaryOperator::Add,
+                            Box::new(Expression::Literal(VariableValue::Int(1))),
+                        ),
+                    }),
+                ],
+            },
+        };
+
+        interpreter.execute_while_loop(&while_loop).unwrap();
+        // Should have printed 0, 1, 2
     }
 }

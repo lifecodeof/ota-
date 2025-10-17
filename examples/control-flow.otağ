@@ -6,3 +6,13 @@ eğer yaş >= 18 ise
 yoksa
     söyle "Çocuk"
 son
+
+sayaç'ı tamsayı olarak tanımla
+sayaç = 0
+
+döngü sayaç < 5 ise
+söyle sayaç
+sayaç = sayaç + 1
+son
+
+söyle "Döngü tamamlandı!"

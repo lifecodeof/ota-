@@ -85,6 +85,8 @@ fn parse_expression(pair: pest::iterators::Pair<Rule>) -> Result<Expression, Box
                     "+" => BinaryOperator::Add,
                     ">" => BinaryOperator::GreaterThan,
                     ">=" => BinaryOperator::GreaterThanOrEqual,
+                    "<" => BinaryOperator::LessThan,
+                    "<=" => BinaryOperator::LessThanOrEqual,
                     _ => return Err(format!("Unknown operator: {}", op_str).into()),
                 });
             }
@@ -160,7 +162,8 @@ fn parse_while_statement(pair: pest::iterators::Pair<Rule>) -> Result<WhileLoop,
     let mut inner = pair.into_inner();
     // Skip "döngü"
     let condition_pair = inner.next().unwrap();
-    let condition = Condition { expression: Box::new(parse_expression(condition_pair)?) };
+    let expr_pair = condition_pair.into_inner().next().unwrap();
+    let condition = Condition { expression: Box::new(parse_expression(expr_pair)?) };
     // Skip "ise"
     let body = parse_control_block(inner.next().unwrap())?;
     // Skip "son"
@@ -364,6 +367,34 @@ mod tests {
             assert!(if_stmt.else_block.is_none());
         } else {
             panic!("Not if statement");
+        }
+    }
+
+    #[test]
+    fn test_parse_while_statement() {
+        let input = "döngü x < 5 ise\nx = x + 1\nsöyle x\nson";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::WhileLoop(while_loop) = &program.statements[0] {
+            // Check condition
+            if let Expression::BinaryOp(left, BinaryOperator::LessThan, right) = &*while_loop.condition.expression {
+                if let Expression::VariableRef(var) = &**left {
+                    assert_eq!(var, "x");
+                } else {
+                    panic!("Left not variable x");
+                }
+                if let Expression::Literal(VariableValue::Int(5)) = &**right {
+                    // ok
+                } else {
+                    panic!("Right not 5");
+                }
+            } else {
+                panic!("Condition not binary op <");
+            }
+            // Check body
+            assert_eq!(while_loop.body.statements.len(), 2);
+        } else {
+            panic!("Not while statement");
         }
     }
 }
