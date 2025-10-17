@@ -64,29 +64,63 @@ fn parse_output_statement(pair: pest::iterators::Pair<Rule>) -> Result<OutputSta
 }
 
 fn parse_expression(pair: pest::iterators::Pair<Rule>) -> Result<Expression, Box<dyn std::error::Error>> {
+    let mut terms = Vec::new();
+    let mut ops = Vec::new();
+
+    for inner in pair.into_inner() {
+        match inner.as_rule() {
+            Rule::term => {
+                let expr = parse_term(inner)?;
+                terms.push(expr);
+            }
+            Rule::operator => {
+                ops.push(BinaryOperator::Add);
+            }
+            _ => return Err("Unexpected in expression".into()),
+        }
+    }
+
+    if terms.is_empty() {
+        return Err("Empty expression".into());
+    }
+
+    if terms.len() == 1 {
+        Ok(terms[0].clone())
+    } else {
+        // Build left-associated binary operations
+        let mut result = terms[0].clone();
+        for i in 0..ops.len() {
+            let right = terms[i + 1].clone();
+            result = Expression::BinaryOp(Box::new(result), ops[i].clone(), Box::new(right));
+        }
+        Ok(result)
+    }
+}
+
+fn parse_term(pair: pest::iterators::Pair<Rule>) -> Result<Expression, Box<dyn std::error::Error>> {
     let inner = pair.into_inner().next().unwrap();
     
     match inner.as_rule() {
         Rule::identifier => Ok(Expression::VariableRef(inner.as_str().to_string())),
         Rule::literal => Ok(Expression::Literal(parse_literal(inner)?)),
-        _ => Err("Complex expressions not yet supported".into()),
+        _ => Err("Unknown term".into()),
     }
 }
 
 fn parse_literal(pair: pest::iterators::Pair<Rule>) -> Result<VariableValue, Box<dyn std::error::Error>> {
     let inner = pair.into_inner().next().unwrap();
-    
+    let s = inner.as_str();
+
     match inner.as_rule() {
         Rule::string_literal => {
-            let s = inner.as_str();
             // Remove quotes
             let content = &s[1..s.len()-1];
             Ok(VariableValue::String(content.to_string()))
         },
-        Rule::int_literal => Ok(VariableValue::Int(inner.as_str().parse()?)),
-        Rule::float_literal => Ok(VariableValue::Float(inner.as_str().parse()?)),
+        Rule::int_literal => Ok(VariableValue::Int(s.trim().parse()?)),
+        Rule::float_literal => Ok(VariableValue::Float(s.trim().parse()?)),
         Rule::boolean_literal => {
-            let val = inner.as_str() == "true";
+            let val = s.trim() == "doğru";
             Ok(VariableValue::Bool(val))
         },
         _ => Err("Unknown literal".into()),
@@ -116,7 +150,7 @@ mod tests {
 
     #[test]
     fn test_parse_output() {
-        let input = "print isim";
+        let input = "söyle isim";
         let program = parse(input).unwrap();
         assert_eq!(program.statements.len(), 1);
         if let Statement::Output(out) = &program.statements[0] {
@@ -166,7 +200,7 @@ mod tests {
 
     #[test]
     fn test_parse_bool_assignment() {
-        let input = "dogru_mu = true";
+        let input = "dogru_mu = doğru";
         let program = parse(input).unwrap();
         assert_eq!(program.statements.len(), 1);
         if let Statement::Assignment(assign) = &program.statements[0] {
@@ -175,6 +209,32 @@ mod tests {
                 assert_eq!(*b, true);
             } else {
                 panic!("Wrong expression");
+            }
+        } else {
+            panic!("Not assignment");
+        }
+    }
+
+    #[test]
+    fn test_parse_binary_add() {
+        let input = "toplam = 5 + 3";
+        let program = parse(input).unwrap();
+        assert_eq!(program.statements.len(), 1);
+        if let Statement::Assignment(assign) = &program.statements[0] {
+            assert_eq!(assign.name, "toplam");
+            if let Expression::BinaryOp(left, BinaryOperator::Add, right) = &assign.expression {
+                if let Expression::Literal(VariableValue::Int(5)) = &**left {
+                    // ok
+                } else {
+                    panic!("Left not 5");
+                }
+                if let Expression::Literal(VariableValue::Int(3)) = &**right {
+                    // ok
+                } else {
+                    panic!("Right not 3");
+                }
+            } else {
+                panic!("Not binary add");
             }
         } else {
             panic!("Not assignment");

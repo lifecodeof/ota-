@@ -67,7 +67,26 @@ impl Interpreter {
                 self.variables.get(name).cloned().ok_or_else(|| format!("Undefined variable: {}", name))
             },
             Expression::Literal(value) => Ok(value.clone()),
-            _ => Err("Complex expressions not yet supported".to_string()),
+            Expression::BinaryOp(left, op, right) => {
+                let left_val = self.evaluate_expression(left)?;
+                let right_val = self.evaluate_expression(right)?;
+                self.evaluate_binary_op(left_val, right_val, op)
+            },
+        }
+    }
+
+    fn evaluate_binary_op(&self, left: VariableValue, right: VariableValue, op: &BinaryOperator) -> Result<VariableValue, String> {
+        match op {
+            BinaryOperator::Add => self.add_values(left, right),
+        }
+    }
+
+    fn add_values(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+        match (left, right) {
+            (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Int(l + r)),
+            (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Float(l + r)),
+            (VariableValue::String(l), VariableValue::String(r)) => Ok(VariableValue::String(l + &r)),
+            _ => Err("Cannot add values of different types".to_string()),
         }
     }
 }

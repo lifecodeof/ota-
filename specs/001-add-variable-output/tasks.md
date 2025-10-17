@@ -100,10 +100,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] Add expression parsing (variables, literals, +) in otağ-compiler/src/parser.rs
-- [ ] T019 [US3] Add expression AST nodes in otağ-compiler/src/ast.rs
-- [ ] T020 [US3] Add expression codegen in otağ-compiler/src/codegen.rs
-- [ ] T021 [US3] Update output statement to handle expressions in otağ-compiler/src/parser.rs
+ - [x] T018 [US3] Add expression parsing (variables, literals, +) in otağ-compiler/src/parser.rs
+ - [x] T019 [US3] Add expression AST nodes in otağ-compiler/src/ast.rs
+ - [x] T020 [US3] Add expression codegen in otağ-compiler/src/codegen.rs
+ - [x] T021 [US3] Update output statement to handle expressions in otağ-compiler/src/parser.rs
 
 **Checkpoint**: All user stories should now be independently functional
 
