@@ -58,7 +58,9 @@ before implementation.
 Our standard development workflow follows this disciplined cycle:
 
 1. **Test (fail)**: Write a failing test that defines the desired behavior
+4. **Lint (fix)**: Run linters and fix any style or quality issues
 2. **Implement**: Write the minimal code to make the test pass
+4. **Lint (fix)**: Run linters and fix any style or quality issues
 3. **Test (success)**: Verify the test passes and all existing tests still work
 4. **Lint (fix)**: Run linters and fix any style or quality issues
 5. **Commit**: Commit the changes with a clear, descriptive message
