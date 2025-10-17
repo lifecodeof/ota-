@@ -7,6 +7,8 @@ Auto-generated from all feature plans. Last updated: 2025-10-17
 read and follow the [constitution](../.specify/memory/constitution.md)
 
 ## Active Technologies
+- Rust 1.75 (or latest stable) + pest, pest_derive (parsing), logos (lexing), clap (CLI) (002-add-control-flow)
+- N/A (interpreter-based, no persistent storage) (002-add-control-flow)
 
 - Rust 1.75 (or latest stable) + LLVM backend for code generation
   (001-add-variable-output)
@@ -28,6 +30,7 @@ cargo test; cargo clippy
 Rust 1.75 (or latest stable): Follow standard conventions
 
 ## Recent Changes
+- 002-add-control-flow: Added Rust 1.75 (or latest stable) + pest, pest_derive (parsing), logos (lexing), clap (CLI)
 
 - 001-add-variable-output: Added Rust 1.75 (or latest stable) + LLVM backend for
   code generation

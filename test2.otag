@@ -1,0 +1,8 @@
+tamsayi = 42
+metin = "Merhaba Dünya"
+ondalik = 3.14159
+mantik = doğru
+söyle tamsayi
+söyle metin
+söyle ondalik
+söyle mantik
