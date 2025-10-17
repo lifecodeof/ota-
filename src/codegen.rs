@@ -28,6 +28,11 @@ impl Interpreter {
             Statement::VariableDeclaration(decl) => self.execute_variable_declaration(decl),
             Statement::Assignment(assign) => self.execute_assignment(assign),
             Statement::Output(output) => self.execute_output_statement(output),
+            Statement::IfStatement(_) => todo!("Implement if statement execution"),
+            Statement::WhileLoop(_) => todo!("Implement while loop execution"),
+            Statement::ForLoop(_) => todo!("Implement for loop execution"),
+            Statement::BreakStatement => todo!("Implement break statement"),
+            Statement::ContinueStatement => todo!("Implement continue statement"),
         }
     }
 
