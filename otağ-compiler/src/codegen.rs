@@ -27,7 +27,7 @@ impl Interpreter {
         match statement {
             Statement::VariableDeclaration(decl) => self.execute_variable_declaration(decl),
             Statement::Assignment(assign) => self.execute_assignment(assign),
-            Statement::OutputStatement(output) => self.execute_output_statement(output),
+            Statement::Output(output) => self.execute_output_statement(output),
         }
     }
 

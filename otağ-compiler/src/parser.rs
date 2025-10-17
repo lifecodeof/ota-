@@ -28,7 +28,7 @@ fn parse_statement(pair: pest::iterators::Pair<Rule>) -> Result<Statement, Box<d
     match inner.as_rule() {
         Rule::variable_declaration => Ok(Statement::VariableDeclaration(parse_variable_declaration(inner)?)),
         Rule::assignment => Ok(Statement::Assignment(parse_assignment(inner)?)),
-        Rule::output_statement => Ok(Statement::OutputStatement(parse_output_statement(inner)?)),
+        Rule::output_statement => Ok(Statement::Output(parse_output_statement(inner)?)),
         _ => Err("Unknown statement".into()),
     }
 }
@@ -119,7 +119,7 @@ mod tests {
         let input = "print isim";
         let program = parse(input).unwrap();
         assert_eq!(program.statements.len(), 1);
-        if let Statement::OutputStatement(out) = &program.statements[0] {
+        if let Statement::Output(out) = &program.statements[0] {
             if let Expression::VariableRef(name) = &out.expression {
                 assert_eq!(name, "isim");
             } else {

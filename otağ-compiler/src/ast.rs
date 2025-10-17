@@ -9,7 +9,7 @@ pub struct Program {
 pub enum Statement {
     VariableDeclaration(VariableDeclaration),
     Assignment(Assignment),
-    OutputStatement(OutputStatement),
+    Output(OutputStatement),
 }
 
 #[derive(Debug)]
