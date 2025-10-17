@@ -32,12 +32,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Extend AST with control flow nodes in src/ast.rs
-- [ ] T005 [P] Add Turkish control flow keywords to lexer in src/lexer.rs
-- [ ] T006 Extend grammar with control flow rules in src/grammar.pest
-- [ ] T007 Extend parser with control flow parsing functions in src/parser.rs
-- [ ] T008 Extend interpreter with control flow execution logic in src/codegen.rs
-- [ ] T009 Extend symbol table for loop variable scoping in src/symbol_table.rs
+- [x] T004 Extend AST with control flow nodes in src/ast.rs
+- [x] T005 [P] Add Turkish control flow keywords to lexer in src/lexer.rs
+- [x] T006 Extend grammar with control flow rules in src/grammar.pest
+- [x] T007 Extend parser with control flow parsing functions in src/parser.rs
+- [x] T008 Extend interpreter with control flow execution logic in src/codegen.rs
+- [x] T009 Extend symbol table for loop variable scoping in src/symbol_table.rs
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -53,15 +53,15 @@
 
 **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Unit tests for if/else parsing in tests/parser_tests.rs
-- [ ] T011 [P] [US1] Unit tests for if/else execution in tests/codegen_tests.rs
-- [ ] T012 [P] [US1] Integration test for if/else programs in tests/integration_tests.rs
+- [x] T010 [P] [US1] Unit tests for if/else parsing in tests/parser_tests.rs
+- [x] T011 [P] [US1] Unit tests for if/else execution in tests/codegen_tests.rs
+- [x] T012 [P] [US1] Integration test for if/else programs in tests/integration_tests.rs
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Implement if_statement parsing in src/parser.rs
-- [ ] T014 [US1] Implement if_statement execution in src/codegen.rs
-- [ ] T015 [US1] Add if/else example to examples/control-flow.otağ
+- [x] T013 [US1] Implement if_statement parsing in src/parser.rs
+- [x] T014 [US1] Implement if_statement execution in src/codegen.rs
+- [x] T015 [US1] Add if/else example to examples/control-flow.otağ
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
