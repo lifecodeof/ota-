@@ -1,7 +1,7 @@
 <!--
 Sync Impact Report:
-- Version change: 1.1.0 → 1.1.1
-- Modified sections: Governance (added agent responsibility)
+- Version change: 1.1.1 → 1.2.0
+- Modified sections: Core Principles (changed III to prioritize features and beginner-friendliness)
 - Templates requiring updates: none
 - Follow-up TODOs: none
 -->
@@ -15,8 +15,8 @@ The language must prioritize Turkish keywords, syntax, and documentation. All co
 ### II. Simplicity and Readability
 Syntax should be simple, readable, and expressive. Avoid unnecessary complexity; prefer clear, concise constructs that are easy to understand and maintain.
 
-### III. Performance and Efficiency (NON-NEGOTIABLE)
-The language must compile efficiently and produce performant executables. Resource usage (memory, CPU) should be optimized by default.
+### III. Feature Implementation Priority and Beginner-Friendliness
+Prioritize rapid feature development and implementation over premature optimization. The language should be close to natural language, especially Turkish, to be beginner-friendly. For example, "x'i tamsayı olarak tanımla" declares x as an integer type.
 
 ### IV. Safety and Reliability
 Provide strong type safety, memory safety where possible, and predictable behavior. Errors should be caught at compile time when feasible.
@@ -42,4 +42,4 @@ Support modular design, libraries, and extensions. Allow users to build upon the
 
 Constitution supersedes all other practices. Amendments require community consensus and documentation. All changes must verify compliance with principles. Agents are responsible for committing their generated work and changes.
 
-**Version**: 1.1.1 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
+**Version**: 1.2.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
