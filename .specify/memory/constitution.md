@@ -1,7 +1,7 @@
 <!--
 Sync Impact Report:
-- Version change: 1.2.1 → 1.2.2
-- Modified sections: Development Workflow (added comprehensive TDD section)
+- Version change: 1.2.2 → 1.2.3
+- Modified sections: Development Workflow (added Logging Standards section)
 - Templates requiring updates: none
 - Follow-up TODOs: none
 -->
@@ -49,7 +49,9 @@ language without modifying core.
 
 ### Test-Driven Development (TDD)
 
-At Otağ, we embrace Test-Driven Development as our core development methodology. TDD ensures code quality, maintainability, and correctness by writing tests before implementation.
+At Otağ, we embrace Test-Driven Development as our core development methodology.
+TDD ensures code quality, maintainability, and correctness by writing tests
+before implementation.
 
 #### The TDD Workflow
 
@@ -63,7 +65,8 @@ Our standard development workflow follows this disciplined cycle:
 
 #### Why TDD?
 
-- **Quality Assurance**: Tests serve as living documentation and prevent regressions
+- **Quality Assurance**: Tests serve as living documentation and prevent
+  regressions
 - **Design Improvement**: Writing tests first leads to better API design
 - **Confidence**: Extensive test coverage enables fearless refactoring
 - **Incremental Progress**: Small, testable steps prevent large, risky changes
@@ -97,6 +100,55 @@ cargo test && cargo clippy
 - End-to-end tests for complete workflows
 - Benchmarks for performance-critical code
 
+### Logging Standards
+
+Proper logging is essential for debugging, monitoring, and maintaining the Otağ
+compiler and associated tools. We enforce structured logging practices to ensure
+consistency and professionalism.
+
+#### Logging Guidelines
+
+- **Use proper logging crates**: Prefer `log` with `env_logger` or `tracing`
+  over `println!` and `eprintln!`
+- **Structured logging**: Use appropriate log levels (error, warn, info, debug,
+  trace)
+- **Performance awareness**: Use appropriate log levels to avoid performance
+  impact in release builds
+- **Contextual information**: Include relevant context (file names, line
+  numbers, variable values)
+
+#### Log Levels
+
+- `error!()`: Critical errors that prevent normal operation
+- `warn!()`: Warnings that don't stop execution but indicate potential issues
+- `info!()`: General information about program flow
+- `debug!()`: Detailed information for debugging
+- `trace!()`: Very detailed tracing information
+
+#### Anti-patterns
+
+Avoid these common logging mistakes:
+
+- Using `println!()` or `eprintln!()` for diagnostic output
+- Over-logging in hot code paths
+- Inconsistent log formatting
+
+#### Example Usage
+
+```rust
+use log::{error, warn, info, debug};
+
+// Good: Structured logging with context
+info!("Starting compilation for file: {}", filename);
+debug!("Parsed AST: {:?}", ast);
+error!("Failed to compile: {}", err);
+warn!("Using deprecated feature");
+trace!("Entering function foo with args: {:?}", args);
+
+// Bad: Direct printing
+eprintln!("Error occurred"); // Don't do this
+```
+
 - Open source development with community contributions.
 - Code reviews required for all changes.
 - Automated testing and CI/CD pipelines.
@@ -112,4 +164,4 @@ language specification resides in [spec.md](spec/spec.md) and must be maintained
 alongside constitution.md. Any additions of new features or fixes to syntax
 logic errors must update [spec.md](spec/spec.md) accordingly.
 
-**Version**: 1.2.2 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
+**Version**: 1.2.3 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-01-27
