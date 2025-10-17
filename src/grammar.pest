@@ -2,7 +2,7 @@ WHITESPACE = _{ " " | "\t" | "\n" | "\r" | ("#" ~ (!"\n" ~ ANY)*) }
 
 program = { SOI ~ statement* ~ EOI }
 
-statement = { variable_declaration | assignment | output_statement }
+statement = { variable_declaration | assignment | output_statement | if_statement | while_statement | for_statement | break_statement | continue_statement }
 
 variable_declaration = { identifier ~ "'ı" ~ type_keyword ~ "olarak" ~ "tanımla" }
 
@@ -29,3 +29,19 @@ float_literal = { ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+ }
 boolean_literal = @{ "doğru" | "yanlış" }
 
 identifier = @{ (ASCII_ALPHA | "ğ" | "ü" | "ş" | "ö" | "ç" | "ı") ~ (ASCII_ALPHANUMERIC | "_" | "ğ" | "ü" | "ş" | "ö" | "ç" | "ı")* }
+
+condition = { expression }
+
+control_block = { statement* }
+
+range_spec = { expression ~ "dan" ~ expression ~ ("adım" ~ expression)? }
+
+if_statement = { "eğer" ~ condition ~ "ise" ~ control_block ~ ("yoksa" ~ control_block)? ~ "son" }
+
+while_statement = { "döngü" ~ condition ~ "ise" ~ control_block ~ "son" }
+
+for_statement = { "için" ~ identifier ~ "in" ~ range_spec ~ "ise" ~ control_block ~ "son" }
+
+break_statement = { "durdur" }
+
+continue_statement = { "devam" }
