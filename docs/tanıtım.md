@@ -328,14 +328,6 @@ söyle kişi.adres.şehir  # İstanbul
 - **"Söz dizimi hatası"**: Noktalama işaretlerini ve anahtar kelimeleri doğru
   kullandığınızdan emin olun
 
-### Yardım Alma
-
-Sorularınız için:
-
-- GitHub Issues sayfasını kullanın
-- Örnek kodları inceleyin
-- Test dosyalarını çalıştırın
-
 ## Gelecek Özellikler
 
 Otağ sürekli gelişmektedir. Planlanan özellikler:
