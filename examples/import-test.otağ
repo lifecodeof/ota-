@@ -1,0 +1,16 @@
+# Modül içe aktarma örneği
+
+kullan "matematik.otağ"
+
+# Matematik modülündeki fonksiyonları kullan
+x'ı tamsayı olarak tanımla
+x = 5
+
+y'ı tamsayı olarak tanımla
+y = 3
+
+toplam'ı tamsayı olarak tanımla
+toplam = topla(x, y)
+
+söyle "Toplam: "
+söyle toplam

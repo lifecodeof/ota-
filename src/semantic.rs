@@ -25,6 +25,11 @@ impl SemanticAnalyzer {
 
     fn analyze_statement(&mut self, statement: &Statement) -> Result<()> {
         match statement {
+            Statement::Import(_) => {
+                // Import statements are processed at the module loading phase
+                // Semantic analysis on imports is done by analyzing the imported program
+                Ok(())
+            }
             Statement::VariableDeclaration(decl) => {
                 // Check if variable already declared
                 if self.symbol_table.lookup(&decl.name).is_some() {
@@ -34,6 +39,7 @@ impl SemanticAnalyzer {
                     ));
                 }
                 self.symbol_table.insert(decl.name.clone(), decl.var_type.clone());
+                Ok(())
             }
             Statement::Assignment(assign) => {
                 // Check if variable is declared
@@ -44,15 +50,17 @@ impl SemanticAnalyzer {
                     ));
                 }
                 // TODO: Type check assignment
+                Ok(())
             }
             Statement::FunctionDefinition(func) => {
                 self.symbol_table.insert_function(func.clone()).map_err(|e| OtagError::semantic(e, Location::unknown()))?;
+                Ok(())
             }
             Statement::StructDefinition(def) => {
                 self.symbol_table.insert_struct(def.clone()).map_err(|e| OtagError::semantic(e, Location::unknown()))?;
+                Ok(())
             }
-            _ => {} // Other statements don't need semantic checks yet
+            _ => Ok(()) // Other statements don't need semantic checks yet
         }
-        Ok(())
     }
 }

@@ -6,7 +6,13 @@ pub struct Program {
 }
 
 #[derive(Debug, Clone)]
+pub struct ImportStatement {
+    pub path: String,
+}
+
+#[derive(Debug, Clone)]
 pub enum Statement {
+    Import(ImportStatement),
     VariableDeclaration(VariableDeclaration),
     Assignment(Assignment),
     Output(OutputStatement),
