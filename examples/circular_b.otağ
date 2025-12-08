@@ -1,0 +1,6 @@
+# Circular import test - file B
+
+kullan "circular_a.otağ"
+
+mesaj = "Dosya B'den merhaba"
+söyle mesaj

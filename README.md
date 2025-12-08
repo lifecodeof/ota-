@@ -11,6 +11,7 @@ Otağ is designed with Turkish localization as a core principle, providing an in
 - **Turkish Keywords**: Natural Turkish syntax (`tanımla`, `söyle`, `fonksiyon`, etc.)
 - **Type Safety**: Compile-time type checking
 - **Functions**: Define and call reusable code blocks
+- **Module System**: Import and reuse code from other files with `kullan` keyword
 - **UTF-8 Support**: Full Turkish character support (ğ, ü, ş, ö, ç, ı)
 - **Simple Syntax**: Beginner-friendly, readable code
 - **Cross-Platform**: Works on Windows, Linux, and macOS
@@ -106,6 +107,26 @@ sonuç = topla(5, 3)
 söyle sonuç  # Outputs 8
 ```
 
+### Module System
+
+Import and reuse code from other files:
+
+`matematik.otağ`:
+```otağ
+fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
+    return a + b
+}
+```
+
+`main.otağ`:
+```otağ
+kullan "matematik.otağ"
+
+sonuç'ı tamsayı olarak tanımla
+sonuç = topla(5, 3)
+söyle sonuç  # Outputs 8
+```
+
 ## Examples
 
 See the `examples/` directory for complete examples:
@@ -114,6 +135,8 @@ See the `examples/` directory for complete examples:
 - `variable.otağ` - Variable usage
 - `types.otağ` - All data types
 - `expressions.otağ` - Arithmetic expressions
+- `import-test.otağ` - Module importing example
+- `nested-import.otağ` - Nested module imports
 
 ## Development
 

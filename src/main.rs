@@ -59,7 +59,7 @@ fn load_program_with_imports(
         )
     })?;
 
-    let mut program = parser::parse(&input, file_path)?;
+    let program = parser::parse(&input, file_path)?;
 
     // Process imports
     let mut all_statements = Vec::new();

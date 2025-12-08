@@ -2,7 +2,6 @@ use crate::ast::*;
 use crate::error_reporting::*;
 use crate::location::*;
 use crate::symbol_table::SymbolTable;
-use crate::types::*;
 
 // Semantic analysis phase
 pub struct SemanticAnalyzer {

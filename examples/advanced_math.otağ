@@ -1,0 +1,9 @@
+# Advanced math - builds on utils
+
+kullan "utils.otağ"
+
+fonksiyon quadruple(x: tamsayı) -> tamsayı {
+    d'ı tamsayı olarak tanımla
+    d = double(x)
+    return d + d
+}
