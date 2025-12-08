@@ -319,11 +319,104 @@ Sorularınız için:
 - Örnek kodları inceleyin
 - Test dosyalarını çalıştırın
 
+## Modül Sistemi
+
+Otağ, kodunuzu farklı dosyalara bölerek düzenli ve yeniden kullanılabilir hale
+getirmenize olanak tanır.
+
+### Modül İçe Aktarma
+
+Başka bir Otağ dosyasındaki fonksiyonları ve tanımları kullanmak için `kullan`
+anahtar kelimesini kullanın:
+
+```otağ
+kullan "matematik.otağ"
+```
+
+Tüm içe aktarma yolları, kaynak dosyaya göre görecelidir.
+
+### Örnek: Basit Modül
+
+`matematik.otağ` dosyası:
+
+```otağ
+# Matematik fonksiyonları modülü
+
+fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
+    return a + b
+}
+
+fonksiyon double(x: tamsayı) -> tamsayı {
+    return x + x
+}
+```
+
+`main.otağ` dosyası:
+
+```otağ
+kullan "matematik.otağ"
+
+x'ı tamsayı olarak tanımla
+x = 10
+
+y'ı tamsayı olarak tanımla
+y = 5
+
+sonuç'ı tamsayı olarak tanımla
+sonuç = topla(x, y)
+
+söyle sonuç  # 15
+```
+
+### İç İçe İçe Aktarmalar
+
+Modüller başka modülleri içe aktarabilir. Otağ, tüm bağımlılıkları otomatik
+olarak yükler:
+
+`utils.otağ`:
+
+```otağ
+fonksiyon double(x: tamsayı) -> tamsayı {
+    return x + x
+}
+```
+
+`advanced_math.otağ`:
+
+```otağ
+kullan "utils.otağ"
+
+fonksiyon quadruple(x: tamsayı) -> tamsayı {
+    d'ı tamsayı olarak tanımla
+    d = double(x)
+    return d + d
+}
+```
+
+`main.otağ`:
+
+```otağ
+kullan "advanced_math.otağ"
+
+n'ı tamsayı olarak tanımla
+n = 5
+
+sonuç'ı tamsayı olarak tanımla
+sonuç = quadruple(n)
+
+söyle sonuç  # 20
+```
+
+### Döngüsel İçe Aktarma Koruması
+
+Otağ, döngüsel içe aktarmaları (A dosyası B'yi, B dosyası A'yı içe aktarır)
+otomatik olarak algılar ve sonsuz döngüleri önler. Her dosya yalnızca bir kez
+yüklenir.
+
 ## Gelecek Özellikler
 
 Otağ sürekli gelişmektedir. Planlanan özellikler:
 
-- Modül sistemi
 - Hata yakalama
 - Dosya işlemleri
 - Ağ programlama

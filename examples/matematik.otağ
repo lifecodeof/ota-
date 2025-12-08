@@ -1,0 +1,9 @@
+# Matematik fonksiyonları modülü
+
+fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
+    return a + b
+}
+
+fonksiyon çarp(a: tamsayı, b: tamsayı) -> tamsayı {
+    return a + a + a + a + a
+}

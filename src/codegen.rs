@@ -25,6 +25,11 @@ impl Interpreter {
 
     fn execute_statement(&mut self, statement: &Statement) -> Result<Option<VariableValue>, String> {
         match statement {
+            Statement::Import(_) => {
+                // Import statements are handled at the parsing/loading phase
+                // and don't need runtime execution
+                Ok(None)
+            },
             Statement::VariableDeclaration(decl) => self.execute_variable_declaration(decl),
             Statement::Assignment(assign) => self.execute_assignment(assign),
             Statement::Output(output) => self.execute_output_statement(output),

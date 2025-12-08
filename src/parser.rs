@@ -39,6 +39,7 @@ fn parse_statement(input: &str, file: &str, pair: pest::iterators::Pair<Rule>) -
     let inner = pair.into_inner().next().unwrap();
     
     match inner.as_rule() {
+        Rule::import_statement => Ok(Statement::Import(parse_import_statement(inner)?)),
         Rule::variable_declaration => Ok(Statement::VariableDeclaration(parse_variable_declaration(inner, input, file)?)),
         Rule::assignment => Ok(Statement::Assignment(parse_assignment(inner)?)),
         Rule::output_statement => Ok(Statement::Output(parse_output_statement(inner)?)),
@@ -52,6 +53,16 @@ fn parse_statement(input: &str, file: &str, pair: pest::iterators::Pair<Rule>) -
         Rule::struct_definition => Ok(Statement::StructDefinition(parse_struct_definition(inner, input, file)?)),
         _ => Err(OtagError::syntax(format!("Bilinmeyen ifade türü: {:?}", inner.as_rule()), Location::unknown())),
     }
+}
+
+fn parse_import_statement(pair: pest::iterators::Pair<Rule>) -> Result<ImportStatement> {
+    let mut inner = pair.into_inner();
+    let string_literal = inner.next().unwrap();
+    let s = string_literal.as_str();
+    // Remove quotes
+    let path = s[1..s.len()-1].to_string();
+    
+    Ok(ImportStatement { path })
 }
 
 fn parse_variable_declaration(pair: pest::iterators::Pair<Rule>, input: &str, file: &str) -> Result<VariableDeclaration> {
@@ -267,7 +278,8 @@ fn parse_function_definition(input: &str, file: &str, pair: pest::iterators::Pai
     let return_type = if let Some(next) = inner.next() {
         if next.as_rule() == Rule::return_part {
             let mut return_inner = next.into_inner();
-            let _arrow = return_inner.next().unwrap(); // "->"
+            // The return_part rule contains: "->" ~ type_keyword
+            // So the first (and only relevant) item should be the type_keyword
             let type_pair = return_inner.next().unwrap();
             Some(parse_type_keyword(type_pair, input, file)?)
         } else if next.as_rule() == Rule::statement {

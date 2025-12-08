@@ -2,7 +2,9 @@ WHITESPACE = _{ " " | "\t" | "\n" | "\r" | ("#" ~ (!"\n" ~ ANY)*) }
 
 program = { SOI ~ statement* ~ EOI }
 
-statement = { struct_definition | variable_declaration | assignment | output_statement | if_statement | while_statement | for_statement | break_statement | continue_statement | function_definition | return_statement }
+statement = { import_statement | struct_definition | variable_declaration | assignment | output_statement | if_statement | while_statement | for_statement | break_statement | continue_statement | function_definition | return_statement }
+
+import_statement = { "kullan" ~ string_literal }
 
 struct_definition = { identifier ~ "{" ~ field_definition ~ ("," ~ field_definition)* ~ "}" }
 

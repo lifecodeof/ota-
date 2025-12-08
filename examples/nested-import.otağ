@@ -1,0 +1,12 @@
+# Main program using nested imports
+
+kullan "advanced_math.otağ"
+
+n'ı tamsayı olarak tanımla
+n = 3
+
+sonuç'ı tamsayı olarak tanımla
+sonuç = quadruple(n)
+
+söyle "Dört katı: "
+söyle sonuç

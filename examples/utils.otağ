@@ -1,0 +1,5 @@
+# Utility functions
+
+fonksiyon double(x: tamsayı) -> tamsayı {
+    return x + x
+}
