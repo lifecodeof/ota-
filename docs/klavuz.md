@@ -346,8 +346,8 @@ fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
     return a + b
 }
 
-fonksiyon çıkar(a: tamsayı, b: tamsayı) -> tamsayı {
-    return a + b
+fonksiyon double(x: tamsayı) -> tamsayı {
+    return x + x
 }
 ```
 
