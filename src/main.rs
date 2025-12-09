@@ -94,7 +94,14 @@ fn load_program_with_imports(
     })
 }
 
-fn main() -> Result<(), crate::error_reporting::OtagError> {
+fn main() {
+    if let Err(e) = run() {
+        eprintln!("{}", e);
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<(), crate::error_reporting::OtagError> {
     let args = Args::parse();
 
     // Load program with all imports
@@ -107,7 +114,7 @@ fn main() -> Result<(), crate::error_reporting::OtagError> {
 
     // Execute
     let mut interpreter = codegen::Interpreter::new();
-    interpreter.execute_program(&program).map_err(|e| crate::error_reporting::OtagError::runtime(e, crate::location::Location::unknown()))?;
+    interpreter.execute_program(&program)?;
 
     Ok(())
 }

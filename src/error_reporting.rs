@@ -57,15 +57,25 @@ impl OtagError {
 
 impl std::fmt::Display for OtagError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}: {}", self.location, self.message)?;
+        let error_kind = match self.error_type {
+            ErrorType::Syntax => "Sözdizimi Hatası",
+            ErrorType::Semantic => "Anlamsal Hata",
+            ErrorType::Runtime => "Çalışma Zamanı Hatası",
+        };
+        
+        writeln!(f, "\n{}: {}", error_kind, self.message)?;
+        writeln!(f, "  --> {}", self.location)?;
+        
         if !self.suggestions.is_empty() {
-            write!(f, "\nÖneriler:")?;
+            writeln!(f, "\nÖneriler:")?;
             for suggestion in &self.suggestions {
-                write!(f, "\n  - {}", suggestion)?;
+                writeln!(f, "  • {}", suggestion)?;
             }
         }
         Ok(())
     }
 }
+
+impl std::error::Error for OtagError {}
 
 pub type Result<T> = std::result::Result<T, OtagError>;

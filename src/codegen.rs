@@ -1,6 +1,8 @@
 use crate::ast::*;
 use crate::types::*;
 use crate::symbol_table::SymbolTable;
+use crate::error_reporting::{OtagError, Result};
+use crate::location::Location;
 use std::collections::HashMap;
 
 pub struct Interpreter {
@@ -16,14 +18,14 @@ impl Interpreter {
         }
     }
 
-    pub fn execute_program(&mut self, program: &Program) -> Result<(), String> {
+    pub fn execute_program(&mut self, program: &Program) -> Result<()> {
         for statement in &program.statements {
             let _ = self.execute_statement(statement)?;
         }
         Ok(())
     }
 
-    fn execute_statement(&mut self, statement: &Statement) -> Result<Option<VariableValue>, String> {
+    fn execute_statement(&mut self, statement: &Statement) -> Result<Option<VariableValue>> {
         match statement {
             Statement::Import(_) => {
                 // Import statements are handled at the parsing/loading phase
@@ -39,7 +41,8 @@ impl Interpreter {
             Statement::Break => self.execute_break(),
             Statement::Continue => self.execute_continue(),
             Statement::FunctionDefinition(func) => {
-                self.symbol_table.insert_function(func.clone())?;
+                self.symbol_table.insert_function(func.clone())
+                    .map_err(|e| OtagError::runtime(e, Location::unknown()))?;
                 Ok(None)
             },
             Statement::Return(expr) => {
@@ -51,13 +54,14 @@ impl Interpreter {
                 }
             },
             Statement::StructDefinition(def) => {
-                self.symbol_table.insert_struct(def.clone())?;
+                self.symbol_table.insert_struct(def.clone())
+                    .map_err(|e| OtagError::runtime(e, Location::unknown()))?;
                 Ok(None)
             },
         }
     }
 
-    fn execute_variable_declaration(&mut self, decl: &VariableDeclaration) -> Result<Option<VariableValue>, String> {
+    fn execute_variable_declaration(&mut self, decl: &VariableDeclaration) -> Result<Option<VariableValue>> {
         self.symbol_table.insert(decl.name.clone(), decl.var_type.clone());
         // Initialize with default values
         let default_value = match decl.var_type {
@@ -65,19 +69,22 @@ impl Interpreter {
             Type::Metin => VariableValue::String(String::new()),
             Type::Ondalikli => VariableValue::Float(0.0),
             Type::Mantiksal => VariableValue::Bool(false),
-            _ => return Err(format!("Unsupported type for variable declaration: {:?}", decl.var_type)),
+            _ => return Err(OtagError::runtime(
+                format!("Desteklenmeyen tür: {:?}", decl.var_type),
+                Location::unknown()
+            )),
         };
         self.variables.insert(decl.name.clone(), default_value);
         Ok(None)
     }
 
-    fn execute_assignment(&mut self, assign: &Assignment) -> Result<Option<VariableValue>, String> {
+    fn execute_assignment(&mut self, assign: &Assignment) -> Result<Option<VariableValue>> {
         let value = self.evaluate_expression(&assign.expression)?;
         self.variables.insert(assign.name.clone(), value);
         Ok(None)
     }
 
-    fn execute_output_statement(&mut self, output: &OutputStatement) -> Result<Option<VariableValue>, String> {
+    fn execute_output_statement(&mut self, output: &OutputStatement) -> Result<Option<VariableValue>> {
         let value = self.evaluate_expression(&output.expression)?;
         match value {
             VariableValue::Int(i) => println!("{}", i),
@@ -89,10 +96,12 @@ impl Interpreter {
         Ok(None)
     }
 
-    fn evaluate_expression(&mut self, expr: &Expression) -> Result<VariableValue, String> {
+    fn evaluate_expression(&mut self, expr: &Expression) -> Result<VariableValue> {
         match expr {
             Expression::VariableRef(name) => {
-                self.variables.get(name).cloned().ok_or_else(|| format!("Undefined variable: {}", name))
+                self.variables.get(name).cloned().ok_or_else(|| 
+                    OtagError::runtime(format!("Tanımlanmamış değişken: {}", name), Location::unknown())
+                )
             },
             Expression::Literal(value) => Ok(value.clone()),
             Expression::BinaryOp(left, op, right) => {
@@ -101,9 +110,14 @@ impl Interpreter {
                 self.evaluate_binary_op(left_val, right_val, op)
             },
             Expression::FunctionCall(call) => {
-                let func = self.symbol_table.lookup_function(&call.name).ok_or_else(|| format!("Undefined function: {}", call.name))?.clone();
+                let func = self.symbol_table.lookup_function(&call.name).ok_or_else(|| 
+                    OtagError::runtime(format!("Tanımlanmamış fonksiyon: {}", call.name), Location::unknown())
+                )?.clone();
                 if call.arguments.len() != func.parameters.len() {
-                    return Err(format!("Function '{}' expects {} arguments, got {}", call.name, func.parameters.len(), call.arguments.len()));
+                    return Err(OtagError::runtime(
+                        format!("Fonksiyon '{}' {} parametre bekliyor, {} verildi", call.name, func.parameters.len(), call.arguments.len()),
+                        Location::unknown()
+                    ));
                 }
                 let mut arg_values = Vec::new();
                 for arg in &call.arguments {
@@ -132,7 +146,9 @@ impl Interpreter {
                 for param in &func.parameters {
                     self.variables.remove(&param.name);
                 }
-                result.ok_or_else(|| format!("Function '{}' did not return a value", call.name))
+                result.ok_or_else(|| 
+                    OtagError::runtime(format!("Fonksiyon '{}' bir değer döndürmedi", call.name), Location::unknown())
+                )
             },
             Expression::ArrayLiteral(array_lit) => {
                 let mut values = Vec::new();
@@ -149,13 +165,22 @@ impl Interpreter {
                         if idx >= 0 && (idx as usize) < arr.len() {
                             Ok(arr[idx as usize].clone())
                         } else {
-                            Err("Array index out of bounds".to_string())
+                            Err(OtagError::runtime(
+                                format!("Dizi indeksi sınırların dışında: {} (dizi uzunluğu: {})", idx, arr.len()),
+                                Location::unknown()
+                            ))
                         }
                     } else {
-                        Err("Array index must be integer".to_string())
+                        Err(OtagError::runtime(
+                            "Dizi indeksi tamsayı olmalıdır".to_string(),
+                            Location::unknown()
+                        ))
                     }
                 } else {
-                    Err("Not an array".to_string())
+                    Err(OtagError::runtime(
+                        "Dizi değil, dizi erişimi yapılamaz".to_string(),
+                        Location::unknown()
+                    ))
                 }
             },
             Expression::StructLiteral(_) => todo!(),
@@ -163,7 +188,7 @@ impl Interpreter {
         }
     }
 
-    fn evaluate_binary_op(&self, left: VariableValue, right: VariableValue, op: &BinaryOperator) -> Result<VariableValue, String> {
+    fn evaluate_binary_op(&self, left: VariableValue, right: VariableValue, op: &BinaryOperator) -> Result<VariableValue> {
         match op {
             BinaryOperator::Add => self.add_values(left, right),
             BinaryOperator::GreaterThan => self.compare_greater(left, right),
@@ -173,55 +198,70 @@ impl Interpreter {
         }
     }
 
-    fn add_values(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+    fn add_values(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue> {
         match (left, right) {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Int(l + r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Float(l + r)),
             (VariableValue::String(l), VariableValue::String(r)) => Ok(VariableValue::String(l + &r)),
-            (left_val, right_val) => Err(format!("Cannot add values of types {:?} and {:?}. Addition is only supported between matching numeric types or strings.", left_val, right_val)),
+            (left_val, right_val) => Err(OtagError::runtime(
+                format!("Tür uyumsuzluğu: {:?} ve {:?} türündeki değerler toplanamaz. Toplama işlemi sadece aynı sayısal türler veya metinler arasında desteklenir.", left_val, right_val),
+                Location::unknown()
+            )),
         }
     }
 
-    fn compare_greater(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+    fn compare_greater(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue> {
         match (left, right) {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l > r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l > r)),
-            (left_val, right_val) => Err(format!("Cannot compare values of types {:?} and {:?} with >. Comparison is only supported between matching numeric types.", left_val, right_val)),
+            (left_val, right_val) => Err(OtagError::runtime(
+                format!("Tür uyumsuzluğu: {:?} ve {:?} türündeki değerler > operatörü ile karşılaştırılamaz. Karşılaştırma sadece aynı sayısal türler arasında desteklenir.", left_val, right_val),
+                Location::unknown()
+            )),
         }
     }
 
-    fn compare_greater_equal(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+    fn compare_greater_equal(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue> {
         match (left, right) {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l >= r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l >= r)),
-            (left_val, right_val) => Err(format!("Cannot compare values of types {:?} and {:?} with >=. Comparison is only supported between matching numeric types.", left_val, right_val)),
+            (left_val, right_val) => Err(OtagError::runtime(
+                format!("Tür uyumsuzluğu: {:?} ve {:?} türündeki değerler >= operatörü ile karşılaştırılamaz. Karşılaştırma sadece aynı sayısal türler arasında desteklenir.", left_val, right_val),
+                Location::unknown()
+            )),
         }
     }
 
-    fn compare_less(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+    fn compare_less(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue> {
         match (left, right) {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l < r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l < r)),
-            (left_val, right_val) => Err(format!("Cannot compare values of types {:?} and {:?} with <. Comparison is only supported between matching numeric types.", left_val, right_val)),
+            (left_val, right_val) => Err(OtagError::runtime(
+                format!("Tür uyumsuzluğu: {:?} ve {:?} türündeki değerler < operatörü ile karşılaştırılamaz. Karşılaştırma sadece aynı sayısal türler arasında desteklenir.", left_val, right_val),
+                Location::unknown()
+            )),
         }
     }
 
-    fn compare_less_equal(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+    fn compare_less_equal(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue> {
         match (left, right) {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l <= r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l <= r)),
-            (left_val, right_val) => Err(format!("Cannot compare values of types {:?} and {:?} with <=. Comparison is only supported between matching numeric types.", left_val, right_val)),
+            (left_val, right_val) => Err(OtagError::runtime(
+                format!("Tür uyumsuzluğu: {:?} ve {:?} türündeki değerler <= operatörü ile karşılaştırılamaz. Karşılaştırma sadece aynı sayısal türler arasında desteklenir.", left_val, right_val),
+                Location::unknown()
+            )),
         }
     }
 
-    fn execute_control_block(&mut self, block: &ControlBlock) -> Result<(), String> {
+    fn execute_control_block(&mut self, block: &ControlBlock) -> Result<()> {
         for statement in &block.statements {
             self.execute_statement(statement)?;
         }
         Ok(())
     }
 
-    fn execute_if_statement(&mut self, if_stmt: &IfStatement) -> Result<Option<VariableValue>, String> {
+    fn execute_if_statement(&mut self, if_stmt: &IfStatement) -> Result<Option<VariableValue>> {
         let condition_value = self.evaluate_expression(&if_stmt.condition.expression)?;
         if let VariableValue::Bool(cond) = condition_value {
             if cond {
@@ -231,17 +271,23 @@ impl Interpreter {
             }
             Ok(None)
         } else {
-            Err("If condition must evaluate to a boolean".to_string())
+            Err(OtagError::runtime(
+                "Eğer koşulu mantıksal (doğru/yanlış) bir değer döndürmelidir".to_string(),
+                Location::unknown()
+            ))
         }
     }
 
-    fn execute_while_loop(&mut self, while_loop: &WhileLoop) -> Result<Option<VariableValue>, String> {
+    fn execute_while_loop(&mut self, while_loop: &WhileLoop) -> Result<Option<VariableValue>> {
         let mut iterations = 0;
         const MAX_ITERATIONS: usize = 10000; // Prevent infinite loops
 
         loop {
             if iterations >= MAX_ITERATIONS {
-                return Err("While loop exceeded maximum iterations (10000). Possible infinite loop.".to_string());
+                return Err(OtagError::runtime(
+                    "Döngü maksimum iterasyon sayısını aştı (10000). Sonsuz döngü olabilir.".to_string(),
+                    Location::unknown()
+                ));
             }
 
             let condition_value = self.evaluate_expression(&while_loop.condition.expression)?;
@@ -252,22 +298,25 @@ impl Interpreter {
                 self.execute_control_block(&while_loop.body)?;
                 iterations += 1;
             } else {
-                return Err("While loop condition must evaluate to a boolean".to_string());
+                return Err(OtagError::runtime(
+                    "Döngü koşulu mantıksal (doğru/yanlış) bir değer döndürmelidir".to_string(),
+                    Location::unknown()
+                ));
             }
         }
         Ok(None)
     }
 
-    fn execute_for_loop(&mut self, _for_loop: &ForLoop) -> Result<Option<VariableValue>, String> {
-        todo!("Implement for loop execution")
+    fn execute_for_loop(&mut self, _for_loop: &ForLoop) -> Result<Option<VariableValue>> {
+        todo!("For döngüsü henüz uygulanmadı")
     }
 
-    fn execute_break(&mut self) -> Result<Option<VariableValue>, String> {
-        todo!("Implement break statement")
+    fn execute_break(&mut self) -> Result<Option<VariableValue>> {
+        todo!("Break ifadesi henüz uygulanmadı")
     }
 
-    fn execute_continue(&mut self) -> Result<Option<VariableValue>, String> {
-        todo!("Implement continue statement")
+    fn execute_continue(&mut self) -> Result<Option<VariableValue>> {
+        todo!("Continue ifadesi henüz uygulanmadı")
     }
 }
 
