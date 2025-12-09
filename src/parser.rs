@@ -1,9 +1,9 @@
-use pest::Parser;
-use pest_derive::Parser;
 use crate::ast::*;
-use crate::types::*;
 use crate::error_reporting::*;
 use crate::location::*;
+use crate::types::*;
+use pest::Parser;
+use pest_derive::Parser;
 use std::collections::HashSet;
 
 #[derive(Parser)]
@@ -17,41 +17,60 @@ pub fn parse(input: &str, file: &str) -> Result<Program> {
     let mut pairs = OtagParser::parse(Rule::program, input).map_err(|e| {
         // Try to extract location from pest error
         let location = match e.location {
-            pest::error::InputLocation::Pos(pos) => Location::from_position(input, pos, file.to_string()),
-            pest::error::InputLocation::Span((start, _)) => Location::from_position(input, start, file.to_string()),
+            pest::error::InputLocation::Pos(pos) => {
+                Location::from_position(input, pos, file.to_string())
+            }
+            pest::error::InputLocation::Span((start, _)) => {
+                Location::from_position(input, start, file.to_string())
+            }
         };
         OtagError::syntax(format!("Parse hatası: {}", e), location)
     })?;
-    
+
     let program_pair = pairs.next().unwrap();
     let mut statements = Vec::new();
-    
+
     for inner in program_pair.into_inner() {
         if inner.as_rule() == Rule::statement {
             statements.push(parse_statement(input, file, inner)?);
         }
     }
-    
+
     Ok(Program { statements })
 }
 
-fn parse_statement(input: &str, file: &str, pair: pest::iterators::Pair<Rule>) -> Result<Statement> {
+fn parse_statement(
+    input: &str,
+    file: &str,
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<Statement> {
     let inner = pair.into_inner().next().unwrap();
-    
+
     match inner.as_rule() {
         Rule::import_statement => Ok(Statement::Import(parse_import_statement(inner)?)),
-        Rule::variable_declaration => Ok(Statement::VariableDeclaration(parse_variable_declaration(inner, input, file)?)),
+        Rule::variable_declaration => Ok(Statement::VariableDeclaration(
+            parse_variable_declaration(inner, input, file)?,
+        )),
         Rule::assignment => Ok(Statement::Assignment(parse_assignment(inner)?)),
         Rule::output_statement => Ok(Statement::Output(parse_output_statement(inner)?)),
         Rule::if_statement => Ok(Statement::If(parse_if_statement(input, file, inner)?)),
-        Rule::while_statement => Ok(Statement::WhileLoop(parse_while_statement(input, file, inner)?)),
+        Rule::while_statement => Ok(Statement::WhileLoop(parse_while_statement(
+            input, file, inner,
+        )?)),
         Rule::for_statement => Ok(Statement::ForLoop(parse_for_statement(input, file, inner)?)),
         Rule::break_statement => Ok(Statement::Break),
         Rule::continue_statement => Ok(Statement::Continue),
-        Rule::function_definition => Ok(Statement::FunctionDefinition(parse_function_definition(input, file, inner)?)),
+        Rule::function_definition => Ok(Statement::FunctionDefinition(parse_function_definition(
+            input, file, inner,
+        )?)),
         Rule::return_statement => Ok(Statement::Return(parse_return_statement(inner)?)),
-        Rule::struct_definition => Ok(Statement::StructDefinition(parse_struct_definition(inner, input, file)?)),
-        _ => Err(OtagError::syntax(format!("Bilinmeyen ifade türü: {:?}", inner.as_rule()), Location::unknown())),
+        Rule::struct_definition => Ok(Statement::StructDefinition(parse_struct_definition(
+            inner, input, file,
+        )?)),
+        _ => Err(OtagError::syntax(
+            format!("Bilinmeyen ifade türü: {:?}", inner.as_rule()),
+            Location::unknown(),
+        )),
     }
 }
 
@@ -60,19 +79,23 @@ fn parse_import_statement(pair: pest::iterators::Pair<Rule>) -> Result<ImportSta
     let string_literal = inner.next().unwrap();
     let s = string_literal.as_str();
     // Remove quotes
-    let path = s[1..s.len()-1].to_string();
-    
+    let path = s[1..s.len() - 1].to_string();
+
     Ok(ImportStatement { path })
 }
 
-fn parse_variable_declaration(pair: pest::iterators::Pair<Rule>, input: &str, file: &str) -> Result<VariableDeclaration> {
+fn parse_variable_declaration(
+    pair: pest::iterators::Pair<Rule>,
+    input: &str,
+    file: &str,
+) -> Result<VariableDeclaration> {
     let mut inner = pair.into_inner();
     let name = inner.next().unwrap().as_str().to_string();
     // "'ı" is matched but not captured
     let type_pair = inner.next().unwrap();
-    
+
     let var_type = parse_type_keyword(type_pair, input, file)?;
-    
+
     Ok(VariableDeclaration { name, var_type })
 }
 
@@ -80,13 +103,16 @@ fn parse_assignment(pair: pest::iterators::Pair<Rule>) -> Result<Assignment> {
     let mut inner = pair.into_inner();
     let name = inner.next().unwrap().as_str().to_string();
     let expr = parse_expression(inner.next().unwrap())?;
-    
-    Ok(Assignment { name, expression: expr })
+
+    Ok(Assignment {
+        name,
+        expression: expr,
+    })
 }
 
 fn parse_output_statement(pair: pest::iterators::Pair<Rule>) -> Result<OutputStatement> {
     let expr = parse_expression(pair.into_inner().next().unwrap())?;
-    
+
     Ok(OutputStatement { expression: expr })
 }
 
@@ -108,15 +134,28 @@ fn parse_expression(pair: pest::iterators::Pair<Rule>) -> Result<Expression> {
                     ">=" => BinaryOperator::GreaterThanOrEqual,
                     "<" => BinaryOperator::LessThan,
                     "<=" => BinaryOperator::LessThanOrEqual,
-                    _ => return Err(OtagError::syntax(format!("Bilinmeyen operatör: {}", op_str), Location::unknown())),
+                    _ => {
+                        return Err(OtagError::syntax(
+                            format!("Bilinmeyen operatör: {}", op_str),
+                            Location::unknown(),
+                        ))
+                    }
                 });
             }
-            _ => return Err(OtagError::syntax(format!("İfadede beklenmeyen token: {:?}", inner.as_rule()), Location::unknown())),
+            _ => {
+                return Err(OtagError::syntax(
+                    format!("İfadede beklenmeyen token: {:?}", inner.as_rule()),
+                    Location::unknown(),
+                ))
+            }
         }
     }
 
     if terms.is_empty() {
-        return Err(OtagError::syntax("İfade boş olamaz".to_string(), Location::unknown()));
+        return Err(OtagError::syntax(
+            "İfade boş olamaz".to_string(),
+            Location::unknown(),
+        ));
     }
 
     if terms.len() == 1 {
@@ -134,7 +173,7 @@ fn parse_expression(pair: pest::iterators::Pair<Rule>) -> Result<Expression> {
 
 fn parse_term(pair: pest::iterators::Pair<Rule>) -> Result<Expression> {
     let inner = pair.into_inner().next().unwrap();
-    
+
     match inner.as_rule() {
         Rule::identifier => Ok(Expression::VariableRef(inner.as_str().to_string())),
         Rule::literal => Ok(Expression::Literal(parse_literal(inner)?)),
@@ -152,16 +191,23 @@ fn parse_literal(pair: pest::iterators::Pair<Rule>) -> Result<VariableValue> {
     match inner.as_rule() {
         Rule::string_literal => {
             // Remove quotes
-            let content = &s[1..s.len()-1];
+            let content = &s[1..s.len() - 1];
             Ok(VariableValue::String(content.to_string()))
-        },
-        Rule::int_literal => Ok(VariableValue::Int(s.trim().parse().map_err(|_| OtagError::syntax("Geçersiz tamsayı".to_string(), Location::unknown()))?)),
-        Rule::float_literal => Ok(VariableValue::Float(s.trim().parse().map_err(|_| OtagError::syntax("Geçersiz ondalıklı sayı".to_string(), Location::unknown()))?)),
+        }
+        Rule::int_literal => Ok(VariableValue::Int(s.trim().parse().map_err(|_| {
+            OtagError::syntax("Geçersiz tamsayı".to_string(), Location::unknown())
+        })?)),
+        Rule::float_literal => Ok(VariableValue::Float(s.trim().parse().map_err(|_| {
+            OtagError::syntax("Geçersiz ondalıklı sayı".to_string(), Location::unknown())
+        })?)),
         Rule::boolean_literal => {
             let val = s.trim() == "doğru";
             Ok(VariableValue::Bool(val))
-        },
-        _ => Err(OtagError::syntax(format!("Bilinmeyen değişmez türü: {:?}", inner.as_rule()), Location::unknown())),
+        }
+        _ => Err(OtagError::syntax(
+            format!("Bilinmeyen değişmez türü: {:?}", inner.as_rule()),
+            Location::unknown(),
+        )),
     }
 }
 
@@ -172,7 +218,10 @@ fn parse_array_literal(pair: pest::iterators::Pair<Rule>) -> Result<ArrayLiteral
             elements.push(parse_expression(inner)?);
         }
     }
-    Ok(ArrayLiteral { elements, element_type: None })
+    Ok(ArrayLiteral {
+        elements,
+        element_type: None,
+    })
 }
 
 fn parse_array_access(pair: pest::iterators::Pair<Rule>) -> Result<ArrayAccess> {
@@ -185,12 +234,18 @@ fn parse_array_access(pair: pest::iterators::Pair<Rule>) -> Result<ArrayAccess> 
     })
 }
 
-fn parse_if_statement(input: &str, file: &str, pair: pest::iterators::Pair<Rule>) -> Result<IfStatement> {
+fn parse_if_statement(
+    input: &str,
+    file: &str,
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<IfStatement> {
     let mut inner = pair.into_inner();
     // Skip "eğer"
     let condition_pair = inner.next().unwrap();
     let expr_pair = condition_pair.into_inner().next().unwrap();
-    let condition = Condition { expression: Box::new(parse_expression(expr_pair)?) };
+    let condition = Condition {
+        expression: Box::new(parse_expression(expr_pair)?),
+    };
     // Skip "ise"
     let then_block = parse_control_block(input, file, inner.next().unwrap())?;
     let else_block = if let Some(yoksa_pair) = inner.next() {
@@ -199,36 +254,63 @@ fn parse_if_statement(input: &str, file: &str, pair: pest::iterators::Pair<Rule>
         None
     };
     // Skip "son"
-    Ok(IfStatement { condition, then_block, else_block })
+    Ok(IfStatement {
+        condition,
+        then_block,
+        else_block,
+    })
 }
 
-fn parse_while_statement(input: &str, file: &str, pair: pest::iterators::Pair<Rule>) -> Result<WhileLoop> {
+fn parse_while_statement(
+    input: &str,
+    file: &str,
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<WhileLoop> {
     let mut inner = pair.into_inner();
     // Skip "döngü"
     let condition_pair = inner.next().unwrap();
     let expr_pair = condition_pair.into_inner().next().unwrap();
-    let condition = Condition { expression: Box::new(parse_expression(expr_pair)?) };
+    let condition = Condition {
+        expression: Box::new(parse_expression(expr_pair)?),
+    };
     // Skip "ise"
     let body = parse_control_block(input, file, inner.next().unwrap())?;
     // Skip "son"
     Ok(WhileLoop { condition, body })
 }
 
-fn parse_for_statement(input: &str, file: &str, pair: pest::iterators::Pair<Rule>) -> Result<ForLoop> {
+fn parse_for_statement(
+    input: &str,
+    file: &str,
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<ForLoop> {
     let mut inner = pair.into_inner();
     // Skip "için"
     let var_name = inner.next().unwrap().as_str().to_string();
-    let loop_variable = LoopVariable { name: var_name, is_auto_generated: false };
+    let loop_variable = LoopVariable {
+        name: var_name,
+        is_auto_generated: false,
+    };
     // Skip "in"
     let range_spec = inner.next().unwrap();
     let (range_start, range_end, step) = parse_range_spec(range_spec)?;
     // Skip "ise"
     let body = parse_control_block(input, file, inner.next().unwrap())?;
     // Skip "son"
-    Ok(ForLoop { loop_variable, range_start, range_end, step, body })
+    Ok(ForLoop {
+        loop_variable,
+        range_start,
+        range_end,
+        step,
+        body,
+    })
 }
 
-fn parse_control_block(input: &str, file: &str, pair: pest::iterators::Pair<Rule>) -> Result<ControlBlock> {
+fn parse_control_block(
+    input: &str,
+    file: &str,
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<ControlBlock> {
     let mut statements = Vec::new();
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::statement {
@@ -252,7 +334,11 @@ fn parse_range_spec(pair: pest::iterators::Pair<Rule>) -> RangeSpecResult {
     Ok((start, end, step))
 }
 
-fn parse_function_definition(input: &str, file: &str, pair: pest::iterators::Pair<Rule>) -> Result<FunctionDefinition> {
+fn parse_function_definition(
+    input: &str,
+    file: &str,
+    pair: pest::iterators::Pair<Rule>,
+) -> Result<FunctionDefinition> {
     let span = pair.as_span();
     let mut inner = pair.into_inner();
     // Skip "fonksiyon"
@@ -270,7 +356,13 @@ fn parse_function_definition(input: &str, file: &str, pair: pest::iterators::Pai
     let mut param_names = HashSet::new();
     for param in &parameters {
         if !param_names.insert(param.name.clone()) {
-            return Err(OtagError::syntax(format!("Fonksiyon '{}'da tekrar eden parametre adı '{}'", name, param.name), Location::from_pest_span(input, &span, file.to_string())));
+            return Err(OtagError::syntax(
+                format!(
+                    "Fonksiyon '{}'da tekrar eden parametre adı '{}'",
+                    name, param.name
+                ),
+                Location::from_pest_span(input, &span, file.to_string()),
+            ));
         }
     }
     // Skip ")"
@@ -296,10 +388,19 @@ fn parse_function_definition(input: &str, file: &str, pair: pest::iterators::Pai
             body.push(parse_statement(input, file, stmt_pair)?);
         }
     }
-    Ok(FunctionDefinition { name, parameters, return_type, body })
+    Ok(FunctionDefinition {
+        name,
+        parameters,
+        return_type,
+        body,
+    })
 }
 
-fn parse_parameter(pair: pest::iterators::Pair<Rule>, input: &str, file: &str) -> Result<Parameter> {
+fn parse_parameter(
+    pair: pest::iterators::Pair<Rule>,
+    input: &str,
+    file: &str,
+) -> Result<Parameter> {
     let mut inner = pair.into_inner();
     let name = inner.next().unwrap().as_str().to_string();
     // Skip ":"
@@ -314,13 +415,19 @@ fn parse_type_keyword(pair: pest::iterators::Pair<Rule>, input: &str, file: &str
         "metin" => Ok(Type::Metin),
         "ondalıklı" => Ok(Type::Ondalikli),
         "mantıksal" => Ok(Type::Mantiksal),
-        _ => Err(OtagError::syntax(format!("Bilinmeyen tür '{}'. Geçerli türler: tamsayı, metin, ondalıklı, mantıksal", type_str), Location::from_pest_span(input, &pair.as_span(), file.to_string()))
-            .with_suggestions(vec![
-                "tamsayı".to_string(),
-                "metin".to_string(),
-                "ondalıklı".to_string(),
-                "mantıksal".to_string(),
-            ])),
+        _ => Err(OtagError::syntax(
+            format!(
+                "Bilinmeyen tür '{}'. Geçerli türler: tamsayı, metin, ondalıklı, mantıksal",
+                type_str
+            ),
+            Location::from_pest_span(input, &pair.as_span(), file.to_string()),
+        )
+        .with_suggestions(vec![
+            "tamsayı".to_string(),
+            "metin".to_string(),
+            "ondalıklı".to_string(),
+            "mantıksal".to_string(),
+        ])),
     }
 }
 
@@ -350,7 +457,11 @@ fn parse_function_call(pair: pest::iterators::Pair<Rule>) -> Result<FunctionCall
     Ok(FunctionCall { name, arguments })
 }
 
-fn parse_struct_definition(pair: pest::iterators::Pair<Rule>, input: &str, file: &str) -> Result<StructDefinition> {
+fn parse_struct_definition(
+    pair: pest::iterators::Pair<Rule>,
+    input: &str,
+    file: &str,
+) -> Result<StructDefinition> {
     let mut inner = pair.into_inner();
     let name = inner.next().unwrap().as_str().to_string();
     let mut fields = Vec::new();
@@ -359,7 +470,10 @@ fn parse_struct_definition(pair: pest::iterators::Pair<Rule>, input: &str, file:
             let mut field_inner = field_pair.into_inner();
             let field_name = field_inner.next().unwrap().as_str().to_string();
             let field_type = parse_type_keyword(field_inner.next().unwrap(), input, file)?;
-            fields.push(FieldDefinition { name: field_name, field_type });
+            fields.push(FieldDefinition {
+                name: field_name,
+                field_type,
+            });
         }
     }
     Ok(StructDefinition { name, fields })
@@ -421,13 +535,13 @@ mod tests {
 
     #[test]
     fn test_parse_float_assignment() {
-        let input = "pi = 3.14";
+        let input = "değer = 2.5";
         let program = parse(input, "test.otag").unwrap();
         assert_eq!(program.statements.len(), 1);
         if let Statement::Assignment(assign) = &program.statements[0] {
-            assert_eq!(assign.name, "pi");
+            assert_eq!(assign.name, "değer");
             if let Expression::Literal(VariableValue::Float(f)) = &assign.expression {
-                assert!((f - 3.14).abs() < 0.001);
+                assert!((f - 2.5).abs() < 0.001);
             } else {
                 panic!("Wrong expression");
             }
@@ -499,7 +613,9 @@ mod tests {
         assert_eq!(program.statements.len(), 1);
         if let Statement::If(if_stmt) = &program.statements[0] {
             // Check condition
-            if let Expression::BinaryOp(left, BinaryOperator::GreaterThan, right) = &*if_stmt.condition.expression {
+            if let Expression::BinaryOp(left, BinaryOperator::GreaterThan, right) =
+                &*if_stmt.condition.expression
+            {
                 if let Expression::VariableRef(var) = &**left {
                     assert_eq!(var, "x");
                 } else {
@@ -534,7 +650,9 @@ mod tests {
         assert_eq!(program.statements.len(), 1);
         if let Statement::WhileLoop(while_loop) = &program.statements[0] {
             // Check condition
-            if let Expression::BinaryOp(left, BinaryOperator::LessThan, right) = &*while_loop.condition.expression {
+            if let Expression::BinaryOp(left, BinaryOperator::LessThan, right) =
+                &*while_loop.condition.expression
+            {
                 if let Expression::VariableRef(var) = &**left {
                     assert_eq!(var, "x");
                 } else {

@@ -1,9 +1,9 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
-    Tamsayi,    // integer
-    Metin,      // string
-    Ondalikli,  // float
-    Mantiksal,  // boolean
+    Tamsayi,   // integer
+    Metin,     // string
+    Ondalikli, // float
+    Mantiksal, // boolean
     Array(Box<Type>),
     Struct(String),
 }

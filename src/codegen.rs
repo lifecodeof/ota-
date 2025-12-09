@@ -1,6 +1,6 @@
 use crate::ast::*;
-use crate::types::*;
 use crate::symbol_table::SymbolTable;
+use crate::types::*;
 use std::collections::HashMap;
 
 pub struct Interpreter {
@@ -23,13 +23,16 @@ impl Interpreter {
         Ok(())
     }
 
-    fn execute_statement(&mut self, statement: &Statement) -> Result<Option<VariableValue>, String> {
+    fn execute_statement(
+        &mut self,
+        statement: &Statement,
+    ) -> Result<Option<VariableValue>, String> {
         match statement {
             Statement::Import(_) => {
                 // Import statements are handled at the parsing/loading phase
                 // and don't need runtime execution
                 Ok(None)
-            },
+            }
             Statement::VariableDeclaration(decl) => self.execute_variable_declaration(decl),
             Statement::Assignment(assign) => self.execute_assignment(assign),
             Statement::Output(output) => self.execute_output_statement(output),
@@ -41,7 +44,7 @@ impl Interpreter {
             Statement::FunctionDefinition(func) => {
                 self.symbol_table.insert_function(func.clone())?;
                 Ok(None)
-            },
+            }
             Statement::Return(expr) => {
                 if let Some(e) = expr {
                     let val = self.evaluate_expression(e)?;
@@ -49,23 +52,32 @@ impl Interpreter {
                 } else {
                     Ok(None)
                 }
-            },
+            }
             Statement::StructDefinition(def) => {
                 self.symbol_table.insert_struct(def.clone())?;
                 Ok(None)
-            },
+            }
         }
     }
 
-    fn execute_variable_declaration(&mut self, decl: &VariableDeclaration) -> Result<Option<VariableValue>, String> {
-        self.symbol_table.insert(decl.name.clone(), decl.var_type.clone());
+    fn execute_variable_declaration(
+        &mut self,
+        decl: &VariableDeclaration,
+    ) -> Result<Option<VariableValue>, String> {
+        self.symbol_table
+            .insert(decl.name.clone(), decl.var_type.clone());
         // Initialize with default values
         let default_value = match decl.var_type {
             Type::Tamsayi => VariableValue::Int(0),
             Type::Metin => VariableValue::String(String::new()),
             Type::Ondalikli => VariableValue::Float(0.0),
             Type::Mantiksal => VariableValue::Bool(false),
-            _ => return Err(format!("Unsupported type for variable declaration: {:?}", decl.var_type)),
+            _ => {
+                return Err(format!(
+                    "Unsupported type for variable declaration: {:?}",
+                    decl.var_type
+                ))
+            }
         };
         self.variables.insert(decl.name.clone(), default_value);
         Ok(None)
@@ -77,7 +89,10 @@ impl Interpreter {
         Ok(None)
     }
 
-    fn execute_output_statement(&mut self, output: &OutputStatement) -> Result<Option<VariableValue>, String> {
+    fn execute_output_statement(
+        &mut self,
+        output: &OutputStatement,
+    ) -> Result<Option<VariableValue>, String> {
         let value = self.evaluate_expression(&output.expression)?;
         match value {
             VariableValue::Int(i) => println!("{}", i),
@@ -91,19 +106,30 @@ impl Interpreter {
 
     fn evaluate_expression(&mut self, expr: &Expression) -> Result<VariableValue, String> {
         match expr {
-            Expression::VariableRef(name) => {
-                self.variables.get(name).cloned().ok_or_else(|| format!("Undefined variable: {}", name))
-            },
+            Expression::VariableRef(name) => self
+                .variables
+                .get(name)
+                .cloned()
+                .ok_or_else(|| format!("Undefined variable: {}", name)),
             Expression::Literal(value) => Ok(value.clone()),
             Expression::BinaryOp(left, op, right) => {
                 let left_val = self.evaluate_expression(left)?;
                 let right_val = self.evaluate_expression(right)?;
                 self.evaluate_binary_op(left_val, right_val, op)
-            },
+            }
             Expression::FunctionCall(call) => {
-                let func = self.symbol_table.lookup_function(&call.name).ok_or_else(|| format!("Undefined function: {}", call.name))?.clone();
+                let func = self
+                    .symbol_table
+                    .lookup_function(&call.name)
+                    .ok_or_else(|| format!("Undefined function: {}", call.name))?
+                    .clone();
                 if call.arguments.len() != func.parameters.len() {
-                    return Err(format!("Function '{}' expects {} arguments, got {}", call.name, func.parameters.len(), call.arguments.len()));
+                    return Err(format!(
+                        "Function '{}' expects {} arguments, got {}",
+                        call.name,
+                        func.parameters.len(),
+                        call.arguments.len()
+                    ));
                 }
                 let mut arg_values = Vec::new();
                 for arg in &call.arguments {
@@ -113,7 +139,8 @@ impl Interpreter {
                 self.symbol_table.push_scope();
                 // Set parameters as variables
                 for (param, val) in func.parameters.iter().zip(arg_values) {
-                    self.symbol_table.insert(param.name.clone(), param.param_type.clone());
+                    self.symbol_table
+                        .insert(param.name.clone(), param.param_type.clone());
                     self.variables.insert(param.name.clone(), val);
                 }
                 // Execute body
@@ -133,14 +160,14 @@ impl Interpreter {
                     self.variables.remove(&param.name);
                 }
                 result.ok_or_else(|| format!("Function '{}' did not return a value", call.name))
-            },
+            }
             Expression::ArrayLiteral(array_lit) => {
                 let mut values = Vec::new();
                 for elem in &array_lit.elements {
                     values.push(self.evaluate_expression(elem)?);
                 }
                 Ok(VariableValue::Array(values))
-            },
+            }
             Expression::ArrayAccess(access) => {
                 let array_val = self.evaluate_expression(&access.array)?;
                 let index_val = self.evaluate_expression(&access.index)?;
@@ -157,13 +184,18 @@ impl Interpreter {
                 } else {
                     Err("Not an array".to_string())
                 }
-            },
+            }
             Expression::StructLiteral(_) => todo!(),
             Expression::StructAccess(_) => todo!(),
         }
     }
 
-    fn evaluate_binary_op(&self, left: VariableValue, right: VariableValue, op: &BinaryOperator) -> Result<VariableValue, String> {
+    fn evaluate_binary_op(
+        &self,
+        left: VariableValue,
+        right: VariableValue,
+        op: &BinaryOperator,
+    ) -> Result<VariableValue, String> {
         match op {
             BinaryOperator::Add => self.add_values(left, right),
             BinaryOperator::GreaterThan => self.compare_greater(left, right),
@@ -173,7 +205,11 @@ impl Interpreter {
         }
     }
 
-    fn add_values(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+    fn add_values(
+        &self,
+        left: VariableValue,
+        right: VariableValue,
+    ) -> Result<VariableValue, String> {
         match (left, right) {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Int(l + r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Float(l + r)),
@@ -182,7 +218,11 @@ impl Interpreter {
         }
     }
 
-    fn compare_greater(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+    fn compare_greater(
+        &self,
+        left: VariableValue,
+        right: VariableValue,
+    ) -> Result<VariableValue, String> {
         match (left, right) {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l > r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l > r)),
@@ -190,7 +230,11 @@ impl Interpreter {
         }
     }
 
-    fn compare_greater_equal(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+    fn compare_greater_equal(
+        &self,
+        left: VariableValue,
+        right: VariableValue,
+    ) -> Result<VariableValue, String> {
         match (left, right) {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l >= r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l >= r)),
@@ -198,7 +242,11 @@ impl Interpreter {
         }
     }
 
-    fn compare_less(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+    fn compare_less(
+        &self,
+        left: VariableValue,
+        right: VariableValue,
+    ) -> Result<VariableValue, String> {
         match (left, right) {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l < r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l < r)),
@@ -206,7 +254,11 @@ impl Interpreter {
         }
     }
 
-    fn compare_less_equal(&self, left: VariableValue, right: VariableValue) -> Result<VariableValue, String> {
+    fn compare_less_equal(
+        &self,
+        left: VariableValue,
+        right: VariableValue,
+    ) -> Result<VariableValue, String> {
         match (left, right) {
             (VariableValue::Int(l), VariableValue::Int(r)) => Ok(VariableValue::Bool(l <= r)),
             (VariableValue::Float(l), VariableValue::Float(r)) => Ok(VariableValue::Bool(l <= r)),
@@ -221,7 +273,10 @@ impl Interpreter {
         Ok(())
     }
 
-    fn execute_if_statement(&mut self, if_stmt: &IfStatement) -> Result<Option<VariableValue>, String> {
+    fn execute_if_statement(
+        &mut self,
+        if_stmt: &IfStatement,
+    ) -> Result<Option<VariableValue>, String> {
         let condition_value = self.evaluate_expression(&if_stmt.condition.expression)?;
         if let VariableValue::Bool(cond) = condition_value {
             if cond {
@@ -235,13 +290,19 @@ impl Interpreter {
         }
     }
 
-    fn execute_while_loop(&mut self, while_loop: &WhileLoop) -> Result<Option<VariableValue>, String> {
+    fn execute_while_loop(
+        &mut self,
+        while_loop: &WhileLoop,
+    ) -> Result<Option<VariableValue>, String> {
         let mut iterations = 0;
         const MAX_ITERATIONS: usize = 10000; // Prevent infinite loops
 
         loop {
             if iterations >= MAX_ITERATIONS {
-                return Err("While loop exceeded maximum iterations (10000). Possible infinite loop.".to_string());
+                return Err(
+                    "While loop exceeded maximum iterations (10000). Possible infinite loop."
+                        .to_string(),
+                );
             }
 
             let condition_value = self.evaluate_expression(&while_loop.condition.expression)?;
@@ -284,10 +345,12 @@ mod tests {
             var_type: Type::Tamsayi,
         };
         interpreter.execute_variable_declaration(&decl).unwrap();
-        interpreter.execute_assignment(&Assignment {
-            name: "x".to_string(),
-            expression: Expression::Literal(VariableValue::Int(10)),
-        }).unwrap();
+        interpreter
+            .execute_assignment(&Assignment {
+                name: "x".to_string(),
+                expression: Expression::Literal(VariableValue::Int(10)),
+            })
+            .unwrap();
 
         // If x > 5 then output "Büyük"
         let if_stmt = IfStatement {
@@ -319,10 +382,12 @@ mod tests {
             var_type: Type::Tamsayi,
         };
         interpreter.execute_variable_declaration(&decl).unwrap();
-        interpreter.execute_assignment(&Assignment {
-            name: "counter".to_string(),
-            expression: Expression::Literal(VariableValue::Int(0)),
-        }).unwrap();
+        interpreter
+            .execute_assignment(&Assignment {
+                name: "counter".to_string(),
+                expression: Expression::Literal(VariableValue::Int(0)),
+            })
+            .unwrap();
 
         // While counter < 3, increment counter and output its value
         let while_loop = WhileLoop {

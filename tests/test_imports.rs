@@ -1,5 +1,5 @@
-use std::process::Command;
 use std::fs;
+use std::process::Command;
 
 #[test]
 fn test_basic_import() {
@@ -9,7 +9,7 @@ fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
     return a + b
 }
 "#;
-    
+
     let main_code = r#"
 kullan "test_helper.otağ"
 
@@ -34,11 +34,19 @@ söyle sonuç
         .expect("Failed to run compiler");
 
     // Check compilation succeeded
-    assert!(output.status.success(), "Compilation failed: {}", String::from_utf8_lossy(&output.stderr));
-    
+    assert!(
+        output.status.success(),
+        "Compilation failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+
     // Check output contains "8"
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("8"), "Expected output to contain 8, got: {}", stdout);
+    assert!(
+        stdout.contains("8"),
+        "Expected output to contain 8, got: {}",
+        stdout
+    );
 
     // Cleanup
     let _ = fs::remove_file("test_helper.otağ");
@@ -53,7 +61,7 @@ fonksiyon double(x: tamsayı) -> tamsayı {
     return x + x
 }
 "#;
-    
+
     let math_code = r#"
 kullan "test_utils.otağ"
 
@@ -86,11 +94,19 @@ söyle sonuç
         .expect("Failed to run compiler");
 
     // Check compilation succeeded
-    assert!(output.status.success(), "Compilation failed: {}", String::from_utf8_lossy(&output.stderr));
-    
+    assert!(
+        output.status.success(),
+        "Compilation failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+
     // Check output contains "20" (5 * 4)
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("20"), "Expected output to contain 20, got: {}", stdout);
+    assert!(
+        stdout.contains("20"),
+        "Expected output to contain 20, got: {}",
+        stdout
+    );
 
     // Cleanup
     let _ = fs::remove_file("test_utils.otağ");
@@ -132,7 +148,7 @@ söyle y
     // Cleanup
     let _ = fs::remove_file("test_circular_a.otağ");
     let _ = fs::remove_file("test_circular_b.otağ");
-    
+
     // Test passes if we reach here without hanging
     assert!(true);
 }
