@@ -183,8 +183,14 @@ impl Interpreter {
                     ))
                 }
             },
-            Expression::StructLiteral(_) => todo!(),
-            Expression::StructAccess(_) => todo!(),
+            Expression::StructLiteral(_) => Err(OtagError::runtime(
+                "Yapı değişmezleri henüz uygulanmadı".to_string(),
+                Location::unknown()
+            )),
+            Expression::StructAccess(_) => Err(OtagError::runtime(
+                "Yapı erişimi henüz uygulanmadı".to_string(),
+                Location::unknown()
+            )),
         }
     }
 

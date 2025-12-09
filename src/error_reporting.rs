@@ -63,7 +63,7 @@ impl std::fmt::Display for OtagError {
             ErrorType::Runtime => "Çalışma Zamanı Hatası",
         };
         
-        writeln!(f, "\n{}: {}", error_kind, self.message)?;
+        writeln!(f, "{}: {}", error_kind, self.message)?;
         writeln!(f, "  --> {}", self.location)?;
         
         if !self.suggestions.is_empty() {
