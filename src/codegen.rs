@@ -308,15 +308,24 @@ impl Interpreter {
     }
 
     fn execute_for_loop(&mut self, _for_loop: &ForLoop) -> Result<Option<VariableValue>> {
-        todo!("For döngüsü henüz uygulanmadı")
+        Err(OtagError::runtime(
+            "For döngüsü henüz uygulanmadı".to_string(),
+            Location::unknown()
+        ))
     }
 
     fn execute_break(&mut self) -> Result<Option<VariableValue>> {
-        todo!("Break ifadesi henüz uygulanmadı")
+        Err(OtagError::runtime(
+            "Break ifadesi henüz uygulanmadı".to_string(),
+            Location::unknown()
+        ))
     }
 
     fn execute_continue(&mut self) -> Result<Option<VariableValue>> {
-        todo!("Continue ifadesi henüz uygulanmadı")
+        Err(OtagError::runtime(
+            "Continue ifadesi henüz uygulanmadı".to_string(),
+            Location::unknown()
+        ))
     }
 }
 
