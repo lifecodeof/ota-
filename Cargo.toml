@@ -3,6 +3,14 @@ name = "otağ-compiler"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "otag"
+path = "src/lib.rs"
+
+[[bin]]
+name = "otağ-compiler"
+path = "src/main.rs"
+
 [dependencies]
 logos = "0.13"
 pest = "2.7"

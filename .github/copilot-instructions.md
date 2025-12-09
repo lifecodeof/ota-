@@ -45,14 +45,86 @@ Otağ is a beginner-friendly programming language designed for Turkish speakers.
 2. **Run specific test modules**:
    ```bash
    cargo test --test test_imports
+   cargo test --test test_in_memory
    cargo test parser::tests
    ```
 
 3. **When adding new features**:
    - Write unit tests in the relevant module (e.g., `parser.rs`, `codegen.rs`)
    - Add integration tests in `tests/` directory if needed
+   - **Use the in-memory testing API** (see below) to avoid creating physical files
    - Ensure tests cover edge cases and error conditions
    - Test with Turkish character input to ensure UTF-8 handling
+
+### In-Memory Testing API
+
+Otağ provides an elegant in-memory testing API that allows you to test programs without creating physical files. This is the **preferred approach** for testing.
+
+#### Quick Start - Testing without files:
+
+```rust
+use otag::OtagRuntime;
+
+// Execute a simple program inline
+let source = r#"
+x'ı tamsayı olarak tanımla
+x = 42
+söyle x
+"#;
+
+let result = OtagRuntime::execute_inline(source);
+assert!(result.is_ok());
+```
+
+#### Testing with In-Memory Imports:
+
+```rust
+use otag::OtagRuntime;
+
+let mut runtime = OtagRuntime::new();
+
+// Add virtual source files
+runtime.add_source("math.otağ", r#"
+fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
+    return a + b
+}
+"#);
+
+runtime.add_source("main.otağ", r#"
+kullan "math.otağ"
+
+sonuç'ı tamsayı olarak tanımla
+sonuç = topla(5, 3)
+söyle sonuç
+"#);
+
+// Execute the main program (imports are resolved in-memory)
+let result = runtime.execute("main.otağ");
+assert!(result.is_ok());
+```
+
+#### Testing Multiple Module Interactions:
+
+```rust
+let mut runtime = OtagRuntime::new();
+
+// Add multiple modules
+runtime.add_source("utils.otağ", "...");
+runtime.add_source("math.otağ", "kullan \"utils.otağ\" ...");
+runtime.add_source("app.otağ", "kullan \"math.otağ\" ...");
+
+// Execute and test
+let result = runtime.execute("app.otağ");
+assert!(result.is_ok());
+```
+
+**See `tests/test_in_memory.rs` for comprehensive examples.**
+
+#### When to Use Each Testing Approach:
+
+- **In-memory API** (preferred): For unit and integration tests of language features
+- **File-based tests**: Only when testing actual file I/O, CLI behavior, or when required for compatibility testing
+
 
 ### Code Quality Standards
 
@@ -98,6 +170,7 @@ Otağ is a beginner-friendly programming language designed for Turkish speakers.
 ```
 otağ/
 ├── src/
+│   ├── lib.rs            # Library API for testing and programmatic use
 │   ├── main.rs           # CLI entry point
 │   ├── lexer.rs          # Tokenization
 │   ├── parser.rs         # AST parsing with unit tests
@@ -110,9 +183,17 @@ otağ/
 │   └── location.rs       # Source location tracking
 ├── tests/
 │   ├── integration/      # Integration tests
-│   └── test_imports.rs   # Import system tests
+│   ├── test_imports.rs   # Import system tests (file-based)
+│   └── test_in_memory.rs # In-memory testing examples
 └── examples/             # Example Otağ programs
 ```
+
+### Key Modules
+
+- **`lib.rs`**: Exposes the public API including `OtagRuntime` and `VirtualFileSystem` for in-memory testing
+- **`main.rs`**: CLI application that wraps the library for command-line use
+- **`parser.rs`, `semantic.rs`, `codegen.rs`**: Core compiler pipeline modules
+- **`tests/test_in_memory.rs`**: Reference examples for in-memory testing approach
 
 ## Error Handling Guidelines
 

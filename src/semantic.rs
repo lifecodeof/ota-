@@ -37,7 +37,8 @@ impl SemanticAnalyzer {
                         Location::unknown(),
                     ));
                 }
-                self.symbol_table.insert(decl.name.clone(), decl.var_type.clone());
+                self.symbol_table
+                    .insert(decl.name.clone(), decl.var_type.clone());
                 Ok(())
             }
             Statement::Assignment(assign) => {
@@ -52,14 +53,18 @@ impl SemanticAnalyzer {
                 Ok(())
             }
             Statement::FunctionDefinition(func) => {
-                self.symbol_table.insert_function(func.clone()).map_err(|e| OtagError::semantic(e, Location::unknown()))?;
+                self.symbol_table
+                    .insert_function(func.clone())
+                    .map_err(|e| OtagError::semantic(e, Location::unknown()))?;
                 Ok(())
             }
             Statement::StructDefinition(def) => {
-                self.symbol_table.insert_struct(def.clone()).map_err(|e| OtagError::semantic(e, Location::unknown()))?;
+                self.symbol_table
+                    .insert_struct(def.clone())
+                    .map_err(|e| OtagError::semantic(e, Location::unknown()))?;
                 Ok(())
             }
-            _ => Ok(()) // Other statements don't need semantic checks yet
+            _ => Ok(()), // Other statements don't need semantic checks yet
         }
     }
 }
