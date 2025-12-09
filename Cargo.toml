@@ -11,6 +11,10 @@ path = "src/lib.rs"
 name = "otağ-compiler"
 path = "src/main.rs"
 
+[[example]]
+name = "api_demo"
+path = "examples/api_demo.rs"
+
 [dependencies]
 logos = "0.13"
 pest = "2.7"
