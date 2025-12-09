@@ -47,7 +47,7 @@ fn test_in_memory_import_simple() {
     runtime.add_source(
         "helpers.otağ",
         r#"
-fonksiyon kare(x: tamsayı) -> tamsayı {
+fonksiyon iki_katı(x: tamsayı) -> tamsayı {
     return x + x
 }
 "#,
@@ -63,7 +63,7 @@ sayı'ı tamsayı olarak tanımla
 sayı = 7
 
 sonuç'ı tamsayı olarak tanımla
-sonuç = kare(sayı)
+sonuç = iki_katı(sayı)
 
 söyle sonuç
 "#,
