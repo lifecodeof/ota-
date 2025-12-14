@@ -259,17 +259,6 @@ söyle sonuç
 
 See `tests/test_in_memory.rs` for more comprehensive examples.
 
-## Contributing
-
-1. Follow the [Constitution](.specify/memory/constitution.md)
-2. Use Test-Driven Development (TDD)
-3. Ensure all tests pass
-4. Update documentation as needed
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## Acknowledgments
 
 - Built with [Rust](https://www.rust-lang.org/)
