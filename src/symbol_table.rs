@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use crate::types::{Type, VariableValue};
 use crate::ast::{FunctionDefinition, StructDefinition};
+use crate::types::{Type, VariableValue};
+use std::collections::HashMap;
 
 #[derive(Debug)]
 #[allow(dead_code)]

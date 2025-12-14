@@ -43,7 +43,13 @@ impl OtagError {
     }
 
     pub fn type_mismatch(expected: &str, found: &str, location: Location) -> Self {
-        Self::semantic(format!("Tür uyumsuzluğu: {} bekleniyordu, {} bulundu", expected, found), location)
+        Self::semantic(
+            format!(
+                "Tür uyumsuzluğu: {} bekleniyordu, {} bulundu",
+                expected, found
+            ),
+            location,
+        )
     }
 
     pub fn undefined_variable(name: &str, location: Location) -> Self {

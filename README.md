@@ -192,9 +192,78 @@ Otağ uses a traditional compiler pipeline:
 
 1. **Lexer**: Tokenizes source code
 2. **Parser**: Builds Abstract Syntax Tree (AST)
-3. **Code Generator**: Currently uses an interpreter for execution
+3. **Semantic Analyzer**: Performs type checking and validation
+4. **Code Generator**: Currently uses an interpreter for execution
 
 Future versions will include LLVM-based code generation for native performance.
+
+## Testing and Library API
+
+Otağ provides a powerful in-memory testing API that allows you to test Otağ programs without creating physical files. This is particularly useful for unit testing and integration testing.
+
+### Using the In-Memory API
+
+Add `otag` as a dependency in your test files:
+
+```rust
+use otag::OtagRuntime;
+
+#[test]
+fn test_simple_program() {
+    let source = r#"
+x'ı tamsayı olarak tanımla
+x = 42
+söyle x
+"#;
+    
+    let result = OtagRuntime::execute_inline(source);
+    assert!(result.is_ok());
+}
+```
+
+### Testing with Virtual Imports
+
+```rust
+use otag::OtagRuntime;
+
+#[test]
+fn test_with_modules() {
+    let mut runtime = OtagRuntime::new();
+    
+    // Add virtual source files
+    runtime.add_source("math.otağ", r#"
+fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
+    return a + b
+}
+"#);
+    
+    runtime.add_source("main.otağ", r#"
+kullan "math.otağ"
+
+sonuç'ı tamsayı olarak tanımla
+sonuç = topla(5, 3)
+söyle sonuç
+"#);
+    
+    let result = runtime.execute("main.otağ");
+    assert!(result.is_ok());
+}
+```
+
+See `tests/test_in_memory.rs` for more comprehensive examples.
+
+## Contributing
+
+1. Follow the [Constitution](.specify/memory/constitution.md)
+2. Use Test-Driven Development (TDD)
+3. Ensure all tests pass
+4. Update documentation as needed
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
 
 - Built with [Rust](https://www.rust-lang.org/)
 - Parser powered by [Pest](https://pest.rs/)

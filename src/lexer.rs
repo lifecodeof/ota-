@@ -1,6 +1,6 @@
-use logos::Logos;
 use crate::error_reporting::{OtagError, Result};
 use crate::location::Location;
+use logos::Logos;
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")] // skip whitespace
@@ -138,5 +138,3 @@ pub fn lex(input: &str) -> Result<Vec<(Token, Location)>> {
 
     Ok(tokens)
 }
-
-
