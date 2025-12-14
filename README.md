@@ -51,6 +51,7 @@ cargo run hello.otağ
 ```
 
 Output:
+
 ```
 25
 Merhaba Otağ!
@@ -112,6 +113,7 @@ söyle sonuç  # Outputs 8
 Import and reuse code from other files:
 
 `matematik.otağ`:
+
 ```otağ
 fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
     return a + b
@@ -119,6 +121,7 @@ fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
 ```
 
 `main.otağ`:
+
 ```otağ
 kullan "matematik.otağ"
 
@@ -193,20 +196,5 @@ Otağ uses a traditional compiler pipeline:
 
 Future versions will include LLVM-based code generation for native performance.
 
-## Contributing
-
-1. Follow the [Constitution](.specify/memory/constitution.md)
-2. Use Test-Driven Development (TDD)
-3. Ensure all tests pass
-4. Update documentation as needed
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
 - Built with [Rust](https://www.rust-lang.org/)
 - Parser powered by [Pest](https://pest.rs/)
-- Inspired by the need for Turkish-localized programming languages</content>
-<parameter name="filePath">d:\uni\senior\otağ\README.md

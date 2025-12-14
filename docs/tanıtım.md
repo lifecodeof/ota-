@@ -327,18 +327,3 @@ söyle kişi.adres.şehir  # İstanbul
   emin olun
 - **"Söz dizimi hatası"**: Noktalama işaretlerini ve anahtar kelimeleri doğru
   kullandığınızdan emin olun
-
-## Gelecek Özellikler
-
-Otağ sürekli gelişmektedir. Planlanan özellikler:
-
-- Modül sistemi
-- Hata yakalama
-- Dosya işlemleri
-- Ağ programlama
-- Grafiksel arayüz desteği
-
----
-
-Bu kılavuz Otağ programlama dilinin temel özelliklerini kapsamaktadır. Daha
-fazla örnek için `examples/` klasörünü inceleyebilirsiniz.
