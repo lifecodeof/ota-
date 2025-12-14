@@ -2,6 +2,13 @@
 
 A Turkish-localized programming language compiler implemented in Rust, focusing on simplicity, readability, and beginner-friendliness.
 
+## Docs
+
+Take a look at these docs for general overview to the project.
+
+- [klavuz](https://github.com/lifecodeof/ota-/blob/main/docs/klavuz.md)
+- [Tanıtım](https://github.com/lifecodeof/ota-/blob/main/docs/tan%C4%B1t%C4%B1m.md)
+
 ## Overview
 
 Otağ is designed with Turkish localization as a core principle, providing an intuitive programming experience for Turkish speakers. The language emphasizes natural syntax while maintaining strong type safety and performance.
@@ -215,7 +222,7 @@ x'ı tamsayı olarak tanımla
 x = 42
 söyle x
 "#;
-    
+
     let result = OtagRuntime::execute_inline(source);
     assert!(result.is_ok());
 }
@@ -229,14 +236,14 @@ use otag::OtagRuntime;
 #[test]
 fn test_with_modules() {
     let mut runtime = OtagRuntime::new();
-    
+
     // Add virtual source files
     runtime.add_source("math.otağ", r#"
 fonksiyon topla(a: tamsayı, b: tamsayı) -> tamsayı {
     return a + b
 }
 "#);
-    
+
     runtime.add_source("main.otağ", r#"
 kullan "math.otağ"
 
@@ -244,7 +251,7 @@ sonuç'ı tamsayı olarak tanımla
 sonuç = topla(5, 3)
 söyle sonuç
 "#);
-    
+
     let result = runtime.execute("main.otağ");
     assert!(result.is_ok());
 }
