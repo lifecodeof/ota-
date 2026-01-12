@@ -92,3 +92,9 @@ impl SymbolTable {
         }
     }
 }
+
+impl Default for SymbolTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}

@@ -68,3 +68,9 @@ impl SemanticAnalyzer {
         }
     }
 }
+
+impl Default for SemanticAnalyzer {
+    fn default() -> Self {
+        Self::new()
+    }
+}

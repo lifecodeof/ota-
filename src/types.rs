@@ -4,7 +4,9 @@ pub enum Type {
     Metin,     // string
     Ondalikli, // float
     Mantiksal, // boolean
+    #[allow(dead_code)]
     Array(Box<Type>),
+    #[allow(dead_code)]
     Struct(String),
 }
 
@@ -18,6 +20,7 @@ pub enum VariableValue {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
 pub enum ErrorType {
     Syntax,
     Semantic,
@@ -29,7 +32,8 @@ pub enum ErrorType {
 
 use crate::ast::Expression;
 
-pub fn check_array_elements_types(elements: &Vec<Expression>) -> Result<Type, String> {
+#[allow(dead_code)]
+pub fn check_array_elements_types(elements: &[Expression]) -> Result<Type, String> {
     if elements.is_empty() {
         return Err("Empty arrays not supported".to_string());
     }
@@ -43,6 +47,7 @@ pub fn check_array_elements_types(elements: &Vec<Expression>) -> Result<Type, St
     Ok(Type::Array(Box::new(first_type)))
 }
 
+#[allow(dead_code)]
 fn get_expression_type(expr: &Expression) -> Type {
     match expr {
         Expression::Literal(val) => match val {

@@ -4,6 +4,7 @@ use logos::Logos;
 
 #[derive(Logos, Debug, PartialEq)]
 #[logos(skip r"[ \t\n\f]+")] // skip whitespace
+#[allow(dead_code)]
 pub enum Token {
     #[token("tanımla")]
     Tanimla,
@@ -105,6 +106,7 @@ pub enum Token {
     Colon,
 }
 
+#[allow(dead_code)]
 pub fn lex(input: &str) -> Result<Vec<(Token, Location)>> {
     let mut lexer = Token::lexer(input);
     let mut tokens = Vec::new();
@@ -129,7 +131,7 @@ pub fn lex(input: &str) -> Result<Vec<(Token, Location)>> {
                 }
             }
             Err(_) => {
-                let span = lexer.span();
+                let _span = lexer.span();
                 let location = Location::new("<input>".to_string(), line, column);
                 return Err(OtagError::syntax("Geçersiz token".to_string(), location));
             }

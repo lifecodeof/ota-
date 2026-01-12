@@ -29,10 +29,12 @@ impl Location {
         Self::from_position(input, span.start(), file)
     }
 
+    #[allow(dead_code)]
     pub fn advance_column(&mut self, by: usize) {
         self.column += by;
     }
 
+    #[allow(dead_code)]
     pub fn next_line(&mut self) {
         self.line += 1;
         self.column = 1;
