@@ -109,16 +109,19 @@ pub struct Parameter {
 #[derive(Debug, Clone)]
 pub struct ArrayLiteral {
     pub elements: Vec<Expression>,
+    #[allow(dead_code)]
     pub element_type: Option<Type>,
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct StructLiteral {
     pub struct_name: String,
     pub fields: Vec<FieldAssignment>,
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct FieldAssignment {
     pub name: String,
     pub value: Expression,
@@ -131,6 +134,7 @@ pub struct ArrayAccess {
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct StructAccess {
     pub struct_expr: Box<Expression>,
     pub field_name: String,
@@ -139,10 +143,12 @@ pub struct StructAccess {
 #[derive(Debug, Clone)]
 pub struct StructDefinition {
     pub name: String,
+    #[allow(dead_code)]
     pub fields: Vec<FieldDefinition>,
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct FieldDefinition {
     pub name: String,
     pub field_type: Type,
@@ -156,8 +162,10 @@ pub enum Expression {
     #[allow(dead_code)]
     FunctionCall(FunctionCall),
     ArrayLiteral(ArrayLiteral),
+    #[allow(dead_code)]
     StructLiteral(StructLiteral),
     ArrayAccess(ArrayAccess),
+    #[allow(dead_code)]
     StructAccess(StructAccess),
 }
 

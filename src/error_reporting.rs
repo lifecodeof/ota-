@@ -9,6 +9,7 @@ pub enum ErrorType {
 
 #[derive(Debug, Clone)]
 pub struct OtagError {
+    #[allow(dead_code)]
     pub error_type: ErrorType,
     pub message: String,
     pub location: Location,
@@ -42,6 +43,7 @@ impl OtagError {
         Self::new(ErrorType::Runtime, message, location)
     }
 
+    #[allow(dead_code)]
     pub fn type_mismatch(expected: &str, found: &str, location: Location) -> Self {
         Self::semantic(
             format!(
@@ -52,10 +54,12 @@ impl OtagError {
         )
     }
 
+    #[allow(dead_code)]
     pub fn undefined_variable(name: &str, location: Location) -> Self {
         Self::semantic(format!("Tanımlanmamış değişken: {}", name), location)
     }
 
+    #[allow(dead_code)]
     pub fn division_by_zero(location: Location) -> Self {
         Self::runtime("Sıfıra bölme hatası".to_string(), location)
     }
